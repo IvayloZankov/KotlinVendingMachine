@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Vending Machine</string>
+    <string name="maintenance_button">Maintenance button</string>
+    <string name="back_button">Back button</string>
+    <string name="coinsInserted">Coins Inserted</string>
+    <string name="productPrice">Product Price</string>
+    <string name="noQuantity">No Quantity</string>
+
+    <string name="alert_title_thank_you">THANK YOU!</string>
+    <string name="alert_text_get_product">Please get your product\nCoins returned as change</string>
+    <string name="alert_text_get_coins">Please get back your coins</string>
+    <string name="alert_title_order_canceled">ORDER CANCELLED!</string>
+
+    <string name="alert_title_out_of_order">OUT OF ORDER!</string>
+    <string name="alert_text_enter_maintenance">Not enough coins to operate\nEnter maintenance</string>
+
+    <string name="maintenance_products_reset">Reset products</string>
+    <string name="maintenance_coins_reset">Reset coins</string>
+
+    <string name="no_internet">Network error</string>
+    <string name="check_connection">Please check your connection</string>
+</resources>
