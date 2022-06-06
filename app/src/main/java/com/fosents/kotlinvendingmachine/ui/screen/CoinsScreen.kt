@@ -6,13 +6,16 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -35,10 +38,13 @@ fun CoinsScreen(
     navHostController: NavHostController,
     coinsViewModel: CoinsViewModel = hiltViewModel()) {
 
+    var coinsAlpha by rememberSaveable { mutableStateOf(1f) }
+
     val selectedProduct = coinsViewModel.selectedProduct.collectAsState()
     val coinsStorage = coinsViewModel.coinsStorage.collectAsState(initial = emptyList())
 
-    val insertedAmount = coinsViewModel.insertedAmount.collectAsState(initial = "0.00")
+    val insertedAmount = coinsViewModel.insertedAmount.collectAsState()
+
     val priceMet = coinsViewModel.priceMet.collectAsState()
     val changeCalculated = coinsViewModel.changeCalculated.collectAsState()
     val orderCancelled = coinsViewModel.orderCancelled.collectAsState()
@@ -49,6 +55,7 @@ fun CoinsScreen(
             coinsViewModel.resetNoConnection()
         }
     } else if (priceMet.value) {
+        coinsAlpha = 0.5f
         if (!changeCalculated.value) coinsViewModel.addUserCoins()
         else ShowGetProductAlert(coinsViewModel.coinsForReturn) { navHostController.popBackStack() }
     }
@@ -69,16 +76,39 @@ fun CoinsScreen(
             }
         }
     ) { paddingValues ->
-        Column(
+        Box(
             modifier = Modifier
-                .fillMaxSize()
                 .background(color = MaterialTheme.colors.backgroundColor)
+                .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            ProductInfoBox(selectedProduct.value, insertedAmount.value)
-            CoinsGrid(coinsStorage.value) {
-                if(!priceMet.value)
-                    coinsViewModel.addUserCoin(it)
+            if (priceMet.value) {
+                coinsAlpha = 0.5f
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    CircularProgressIndicator(
+                        color = Color.White
+                    )
+                }
+            }
+            LazyVerticalGrid(
+                modifier = Modifier
+                    .alpha(coinsAlpha),
+                columns = GridCells.Fixed(2),
+                contentPadding = PaddingValues(bottom = 32.dp),
+            ) {
+                item(
+                    span = { GridItemSpan(2) }
+                ) {
+                    ProductInfoBox(selectedProduct.value, insertedAmount.value)
+                }
+                items(coinsStorage.value.size) {
+                    CoinsCard(coinsStorage.value[it]) {
+                        coinsViewModel.addUserCoin(coinsStorage.value[it])
+                    }
+                }
             }
         }
     }
@@ -177,10 +207,13 @@ fun ProductInfoBox(product: Product?, insertedCoins: String) {
 }
 
 @Composable
-fun CoinsGrid(coins: List<Coin>, updateInsertedAmount: (coin: Coin) -> Unit) {
+fun CoinsGrid(coinsAlpha: Float, coins: List<Coin>, updateInsertedAmount: (coin: Coin) -> Unit) {
     LazyVerticalGrid(
+        modifier = Modifier
+            .alpha(coinsAlpha)
+            .height(200.dp),
         columns = GridCells.Fixed(2),
-        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 32.dp)
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 32.dp),
     ) {
         items(coins.size) {
             CoinsCard(coins[it]) {
@@ -237,7 +270,7 @@ fun PreviewInfoBox() {
 @Preview
 @Composable
 fun PreviewCoinsBox() {
-    CoinsGrid(listOf(
+    CoinsGrid(1f, listOf(
         Coin(1, "five_cents", 0.05, 4),
         Coin(2, "fifty_cents", 0.50, 4),
         Coin(3, "one_eur", 1.00, 4),

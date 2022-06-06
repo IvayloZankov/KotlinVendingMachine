@@ -5,9 +5,10 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -20,31 +21,48 @@ import com.fosents.kotlinvendingmachine.ui.theme.backgroundColor
 
 @Composable
 fun ShowOrderCancelledAlert(listCoins: List<Coin>, onClick: () -> Unit) {
+    AnimatedAlert {
+        ContentOrderCancelled(it, listCoins, onClick)
+    }
+}
+
+@Composable
+fun ContentOrderCancelled(anims: List<Float>, listCoins: List<Coin>, onClick: () -> Unit) {
     Dialog(
         onDismissRequest = {}
     ) {
         Surface(
+            modifier = Modifier
+                .alpha(alpha = anims[0]),
             shape = RoundedCornerShape(10),
             color = MaterialTheme.colors.backgroundColor
         ) {
             Column(
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier
+                    .padding(16.dp)
+
             ) {
                 Text(
                     style = Typography.h5,
                     text = stringResource(id = R.string.alert_title_order_canceled),
-                    modifier = Modifier.padding(bottom = 10.dp),
+                    modifier = Modifier
+                        .padding(bottom = 10.dp)
+                        .alpha(alpha = anims[1]),
                     color = Color.White
                 )
                 Text(
                     style = Typography.subtitle1,
                     text = stringResource(id = R.string.alert_text_get_coins),
-                    modifier = Modifier.padding(bottom = 10.dp),
+                    modifier = Modifier
+                        .padding(bottom = 10.dp)
+                        .alpha(alpha = anims[2]),
                     color = Color.White
                 )
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(3),
-                    modifier = Modifier.padding(bottom = 10.dp)
+                    modifier = Modifier
+                        .padding(bottom = 10.dp)
+                        .alpha(alpha = anims[2])
                 ) {
                     items(listCoins.size) {
                         CoinsCardReturn(listCoins[it])
@@ -60,7 +78,9 @@ fun ShowOrderCancelledAlert(listCoins: List<Coin>, onClick: () -> Unit) {
                             pressedElevation = 15.dp,
                             disabledElevation = 0.dp
                         ),
-                        modifier = Modifier.padding(end = 16.dp),
+                        modifier = Modifier
+                            .padding(end = 16.dp)
+                            .alpha(alpha = anims[3]),
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = Color.White
                         ),
@@ -80,7 +100,8 @@ fun ShowOrderCancelledAlert(listCoins: List<Coin>, onClick: () -> Unit) {
 @Preview
 @Composable
 fun PreviewOrderCancelledAlert() {
-    ShowOrderCancelledAlert(listOf(
+    ContentOrderCancelled(
+        listOf(1f, 1f, 1f, 1f), listOf(
         Coin(
             id = 2,
             name = "twenty_cents",

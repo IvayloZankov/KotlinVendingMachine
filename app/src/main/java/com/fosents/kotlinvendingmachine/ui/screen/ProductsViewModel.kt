@@ -6,9 +6,9 @@ import com.fosents.kotlinvendingmachine.data.DataRepo
 import com.fosents.kotlinvendingmachine.model.Coin
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -22,7 +22,7 @@ class ProductsViewModel @Inject constructor(
     private val _vendingId = MutableStateFlow("")
     private val vendingId: StateFlow<String> = _vendingId
 
-    val getProducts = dataRepo.getProducts()
+    val getProducts = dataRepo.getProducts().map { list -> list.filter { it.quantity > 0 } }
 
     private val _coinsStorage = MutableStateFlow<List<Coin>>(emptyList())
 //    val coinsStorage: StateFlow<List<Coin>> = _coinsStorage
@@ -51,7 +51,6 @@ class ProductsViewModel @Inject constructor(
         _noConnection.value = false
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                delay(2000)
                 dataRepo.fetchRemoteData()
                 _isLoading.value = false
             } catch (e: IOException) {

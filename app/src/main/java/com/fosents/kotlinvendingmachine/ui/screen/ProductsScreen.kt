@@ -65,12 +65,17 @@ fun ProductsScreen(
                 .fillMaxSize()
                 .background(color = MaterialTheme.colors.backgroundColor)
                 .padding(paddingValues),
-            contentAlignment = Alignment.Center
+//            contentAlignment = Alignment.Center
         ) {
             if (isLoading.value) {
-                CircularProgressIndicator(
-                    color = Color.White
-                )
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    CircularProgressIndicator(
+                        color = Color.White
+                    )
+                }
             } else {
                 ProductsGrid(navController, products.value)
             }
