@@ -35,6 +35,8 @@ fun ProductsScreen(
     navController: NavHostController,
     productsViewModel: ProductsViewModel = hiltViewModel()) {
 
+    val showDialog = remember { mutableStateOf(true) }
+
     val products = productsViewModel.getProducts.collectAsState(initial = emptyList())
     val outOfOrder = productsViewModel.outOfOrder.collectAsState()
     val noConnection = productsViewModel.noConnection.collectAsState()
@@ -49,8 +51,11 @@ fun ProductsScreen(
     }
 
     if (outOfOrder.value)
-        ShowOutOfOrderAlert {
-            navController.navigate(Screen.Maintenance.route)
+        if (showDialog.value) {
+            ShowOutOfOrderAlert {
+                showDialog.value = false
+                navController.navigate(Screen.Maintenance.route)
+            }
         }
 
     Scaffold(

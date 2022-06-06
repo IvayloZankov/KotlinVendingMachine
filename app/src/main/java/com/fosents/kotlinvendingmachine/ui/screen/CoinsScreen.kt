@@ -39,6 +39,7 @@ fun CoinsScreen(
     coinsViewModel: CoinsViewModel = hiltViewModel()) {
 
     var coinsAlpha by rememberSaveable { mutableStateOf(1f) }
+    val showDialog = remember { mutableStateOf(true) }
 
     val selectedProduct = coinsViewModel.selectedProduct.collectAsState()
     val coinsStorage = coinsViewModel.coinsStorage.collectAsState(initial = emptyList())
@@ -57,12 +58,20 @@ fun CoinsScreen(
     } else if (priceMet.value) {
         coinsAlpha = 0.5f
         if (!changeCalculated.value) coinsViewModel.addUserCoins()
-        else ShowGetProductAlert(coinsViewModel.coinsForReturn) { navHostController.popBackStack() }
+        else if (showDialog.value) {
+            ShowGetProductAlert(coinsViewModel.coinsForReturn) {
+                showDialog.value = false
+                navHostController.popBackStack()
+            }
+        }
     }
 
     if (orderCancelled.value)
-        ShowOrderCancelledAlert(coinsViewModel.coinsForReturn) {
-            navHostController.popBackStack()
+        if (showDialog.value) {
+            ShowOrderCancelledAlert(coinsViewModel.coinsForReturn) {
+                showDialog.value = false
+                navHostController.popBackStack()
+            }
         }
 
     BackHandler(enabled = true) {
