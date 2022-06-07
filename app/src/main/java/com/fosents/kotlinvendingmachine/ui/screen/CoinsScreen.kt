@@ -46,7 +46,7 @@ fun CoinsScreen(
 
     val insertedAmount = coinsViewModel.insertedAmount.collectAsState()
 
-    val priceMet = coinsViewModel.priceMet.collectAsState()
+    val priceMet by coinsViewModel.priceMet.collectAsState()
     val changeCalculated = coinsViewModel.changeCalculated.collectAsState()
     val orderCancelled = coinsViewModel.orderCancelled.collectAsState()
     val noConnection = coinsViewModel.noConnection.collectAsState()
@@ -55,7 +55,7 @@ fun CoinsScreen(
         NoConnectionAlert {
             coinsViewModel.resetNoConnection()
         }
-    } else if (priceMet.value) {
+    } else if (priceMet) {
         coinsAlpha = 0.5f
         if (!changeCalculated.value) coinsViewModel.addUserCoins()
         else if (showDialog.value) {
@@ -91,7 +91,7 @@ fun CoinsScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            if (priceMet.value) {
+            if (priceMet) {
                 coinsAlpha = 0.5f
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -115,7 +115,8 @@ fun CoinsScreen(
                 }
                 items(coinsStorage.value.size) {
                     CoinsCard(coinsStorage.value[it]) {
-                        coinsViewModel.addUserCoin(coinsStorage.value[it])
+                        if (!priceMet)
+                            coinsViewModel.addUserCoin(coinsStorage.value[it])
                     }
                 }
             }

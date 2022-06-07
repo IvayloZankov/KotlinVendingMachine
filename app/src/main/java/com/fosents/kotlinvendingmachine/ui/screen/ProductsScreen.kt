@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,7 +38,7 @@ fun ProductsScreen(
 
     val showDialog = remember { mutableStateOf(true) }
 
-    val products = productsViewModel.getProducts.collectAsState(initial = emptyList())
+    val products by productsViewModel.getProducts.collectAsState(initial = emptyList())
     val outOfOrder = productsViewModel.outOfOrder.collectAsState()
     val noConnection = productsViewModel.noConnection.collectAsState()
     val isLoading = productsViewModel.isLoading.collectAsState()
@@ -81,8 +82,22 @@ fun ProductsScreen(
                         color = Color.White
                     )
                 }
+            } else if (products.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        style = Typography.h3,
+                        text = stringResource(id = R.string.alert_title_out_of_products),
+                        modifier = Modifier
+                            .padding(bottom = 10.dp),
+                        color = Color.White,
+                        textAlign = TextAlign.Center
+                    )
+                }
             } else {
-                ProductsGrid(navController, products.value)
+                ProductsGrid(navController, products)
             }
         }
     }

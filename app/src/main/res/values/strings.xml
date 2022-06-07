@@ -12,6 +12,7 @@
     <string name="alert_title_order_canceled">ORDER CANCELLED!</string>
 
     <string name="alert_title_out_of_order">OUT OF ORDER!</string>
+    <string name="alert_title_out_of_products">OUT OF PRODUCTS</string>
     <string name="alert_text_enter_maintenance">Not enough coins to operate\nEnter maintenance</string>
 
     <string name="maintenance_products_reset">Reset products</string>

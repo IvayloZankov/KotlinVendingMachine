@@ -2,8 +2,8 @@
 
 ## About
 
-Android vending machine implementation on Kotlin with Jetpack Compose, Coroutines, Retrofit, 
-Room, DataStore.
+Android vending machine implementation on Kotlin with Jetpack Compose, Hilt-Dagger, Coroutines, 
+Retrofit, Room, DataStore.
 
 ## Description
 
