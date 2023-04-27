@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Vending Machine</string>
+    <string name="app_name">Compose VM</string>
     <string name="maintenance_button">Maintenance button</string>
     <string name="back_button">Back button</string>
     <string name="coinsInserted">Coins Inserted</string>
