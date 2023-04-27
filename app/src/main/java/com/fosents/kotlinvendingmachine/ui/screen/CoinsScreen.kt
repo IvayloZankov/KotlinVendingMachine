@@ -27,6 +27,7 @@ import androidx.navigation.NavHostController
 import com.fosents.kotlinvendingmachine.R
 import com.fosents.kotlinvendingmachine.model.Coin
 import com.fosents.kotlinvendingmachine.model.Product
+import com.fosents.kotlinvendingmachine.sound.SoundManager
 import com.fosents.kotlinvendingmachine.ui.alert.NoConnectionAlert
 import com.fosents.kotlinvendingmachine.ui.alert.ShowGetProductAlert
 import com.fosents.kotlinvendingmachine.ui.alert.ShowOrderCancelledAlert
@@ -61,6 +62,7 @@ fun CoinsScreen(
         else if (showDialog.value) {
             ShowGetProductAlert(coinsViewModel.coinsForReturn) {
                 showDialog.value = false
+                SoundManager.getInstance().playClick()
                 navHostController.popBackStack()
             }
         }
@@ -70,6 +72,7 @@ fun CoinsScreen(
         if (showDialog.value) {
             ShowOrderCancelledAlert(coinsViewModel.coinsForReturn) {
                 showDialog.value = false
+                SoundManager.getInstance().playClick()
                 navHostController.popBackStack()
             }
         }
@@ -115,8 +118,10 @@ fun CoinsScreen(
                 }
                 items(coinsStorage.value.size) {
                     CoinsCard(coinsStorage.value[it]) {
-                        if (!priceMet)
+                        if (!priceMet) {
+                            SoundManager.getInstance().playCoin()
                             coinsViewModel.addUserCoin(coinsStorage.value[it])
+                        }
                     }
                 }
             }

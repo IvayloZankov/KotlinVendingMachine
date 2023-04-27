@@ -23,6 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import com.fosents.kotlinvendingmachine.R
 import com.fosents.kotlinvendingmachine.model.Product
 import com.fosents.kotlinvendingmachine.navigation.Screen
+import com.fosents.kotlinvendingmachine.sound.SoundManager
 import com.fosents.kotlinvendingmachine.ui.alert.NoConnectionAlert
 import com.fosents.kotlinvendingmachine.ui.alert.ShowOutOfOrderAlert
 import com.fosents.kotlinvendingmachine.ui.theme.Gold
@@ -35,7 +36,6 @@ import java.util.*
 fun ProductsScreen(
     navController: NavHostController,
     productsViewModel: ProductsViewModel = hiltViewModel()) {
-
     val showDialog = remember { mutableStateOf(true) }
 
     val products by productsViewModel.getProducts.collectAsState(initial = emptyList())
@@ -114,6 +114,7 @@ fun ProductsGrid(
     ) {
         items(products.size) {
             ProductCard(products[it]) {
+                SoundManager.getInstance().playClick()
                 navController.navigate(Screen.Coins.passProductId(products[it].id))
             }
         }

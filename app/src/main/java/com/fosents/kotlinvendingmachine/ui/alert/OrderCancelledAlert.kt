@@ -16,11 +16,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.fosents.kotlinvendingmachine.R
 import com.fosents.kotlinvendingmachine.model.Coin
+import com.fosents.kotlinvendingmachine.sound.SoundManager
 import com.fosents.kotlinvendingmachine.ui.theme.Typography
 import com.fosents.kotlinvendingmachine.ui.theme.backgroundColor
 
 @Composable
 fun ShowOrderCancelledAlert(listCoins: List<Coin>, onClick: () -> Unit) {
+    SoundManager.getInstance().playError()
     AnimatedAlert {
         ContentOrderCancelled(it, listCoins, onClick)
     }

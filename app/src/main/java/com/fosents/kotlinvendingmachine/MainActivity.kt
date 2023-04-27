@@ -8,6 +8,7 @@ import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.navigation.NavHostController
 import com.fosents.kotlinvendingmachine.navigation.SetupNavGraph
+import com.fosents.kotlinvendingmachine.sound.SoundManager
 import com.fosents.kotlinvendingmachine.ui.theme.KotlinVendingMachineTheme
 import com.fosents.kotlinvendingmachine.ui.theme.VendingRippleTheme
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
@@ -29,5 +30,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+        SoundManager.getInstance().loadSounds(this)
     }
 }
