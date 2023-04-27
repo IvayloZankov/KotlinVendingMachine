@@ -62,6 +62,7 @@ fun ProductsScreen(
     Scaffold(
         topBar = {
             ProductsTopBar {
+                SoundManager.getInstance().playClick()
                 navController.navigate(Screen.Maintenance.route)
             }
         }
@@ -127,12 +128,13 @@ fun ProductCard(
     product: Product,
     onClick: () -> Unit
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-    val color = if (isPressed) Gold else Color.White
+    var selected by remember { mutableStateOf(false) }
+    val color = if (selected) Gold else Color.White
     Button(
-        onClick = {if (product.quantity > 0) onClick()},
-        interactionSource = interactionSource,
+        onClick = {if (product.quantity > 0) {
+            selected = true
+            onClick()
+        }},
         elevation =  ButtonDefaults.elevation(
             defaultElevation = 10.dp,
             pressedElevation = 15.dp,

@@ -19,6 +19,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.fosents.kotlinvendingmachine.R
+import com.fosents.kotlinvendingmachine.sound.SoundManager
 import com.fosents.kotlinvendingmachine.ui.alert.NoConnectionAlert
 import com.fosents.kotlinvendingmachine.ui.theme.Gold
 import com.fosents.kotlinvendingmachine.ui.theme.Teal700
@@ -46,6 +47,7 @@ fun MaintenanceScreen(
     Scaffold(
         topBar = {
             MaintenanceTopBar {
+                SoundManager.getInstance().playClick()
                 navController.popBackStack()
             }
         }
@@ -61,6 +63,7 @@ fun MaintenanceScreen(
             ) {
                 items(2) {
                     MaintenanceCard(options[it]) {
+                        SoundManager.getInstance().playClick()
                         maintenanceViewModel.initReset(options[it])
                     }
                 }
