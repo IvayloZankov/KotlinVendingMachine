@@ -13,7 +13,6 @@ import com.fosents.kotlinvendingmachine.ui.screen.MaintenanceScreen
 import com.fosents.kotlinvendingmachine.ui.screen.ProductsScreen
 import com.fosents.kotlinvendingmachine.util.Constants.ARG_PRODUCT_ID
 import com.google.accompanist.navigation.animation.AnimatedNavHost
-import com.google.accompanist.navigation.animation.navigation
 
 @ExperimentalAnimationApi
 @Composable
