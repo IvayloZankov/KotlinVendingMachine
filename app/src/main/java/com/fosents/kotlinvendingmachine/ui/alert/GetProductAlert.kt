@@ -4,7 +4,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,8 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.fosents.kotlinvendingmachine.R
 import com.fosents.kotlinvendingmachine.model.Coin
+import com.fosents.kotlinvendingmachine.ui.theme.BackgroundColor
 import com.fosents.kotlinvendingmachine.ui.theme.Typography
-import com.fosents.kotlinvendingmachine.ui.theme.backgroundColor
 
 @Composable
 fun ShowGetProductAlert(listCoins: List<Coin>, onClick: () -> Unit) {
@@ -35,13 +38,13 @@ fun ContentGetProduct(anims: List<Float>, listCoins: List<Coin>, onClick: () -> 
             modifier = Modifier
                 .alpha(alpha = anims[0]),
             shape = RoundedCornerShape(10),
-            color = MaterialTheme.colors.backgroundColor
+            color = BackgroundColor
         ) {
             Column(
                 modifier = Modifier.padding(16.dp)
             ) {
                 Text(
-                    style = Typography.h5,
+                    style = Typography.headlineSmall,
                     text = stringResource(id = R.string.alert_title_thank_you),
                     modifier = Modifier
                         .padding(bottom = 10.dp)
@@ -49,7 +52,7 @@ fun ContentGetProduct(anims: List<Float>, listCoins: List<Coin>, onClick: () -> 
                     color = Color.White
                 )
                 Text(
-                    style = Typography.subtitle1,
+                    style = Typography.labelLarge,
                     text = stringResource(id = R.string.alert_text_get_product),
                     modifier = Modifier
                         .padding(bottom = 10.dp)
@@ -71,7 +74,7 @@ fun ContentGetProduct(anims: List<Float>, listCoins: List<Coin>, onClick: () -> 
                     contentAlignment = Alignment.BottomEnd
                 ) {
                     Button(
-                        elevation =  ButtonDefaults.elevation(
+                        elevation =  ButtonDefaults.buttonElevation(
                             defaultElevation = 10.dp,
                             pressedElevation = 15.dp,
                             disabledElevation = 0.dp
@@ -80,13 +83,13 @@ fun ContentGetProduct(anims: List<Float>, listCoins: List<Coin>, onClick: () -> 
                             .padding(end = 16.dp)
                             .alpha(alpha = anims[3]),
                         colors = ButtonDefaults.buttonColors(
-                            backgroundColor = Color.White
+                            containerColor = Color.White
                         ),
                         onClick = onClick,
                     ) {
                         Text(
                             text = "OK",
-                            color = MaterialTheme.colors.backgroundColor
+                            color = BackgroundColor
                         )
                     }
                 }

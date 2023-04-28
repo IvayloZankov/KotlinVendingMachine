@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,13 +38,13 @@ fun CoinsCardReturn(
             ) {
                 Text(
                     text = String.format(Locale.CANADA, "%.2f", coin.price),
-                    style = Typography.h6,
+                    style = Typography.titleLarge,
                     color = Color.White,
                     maxLines = 1,
                 )
                 Text(
                     text = coin.quantity.toString(),
-                    style = Typography.overline,
+                    style = Typography.bodyMedium,
                     color = Color.White,
                     maxLines = 1,
                 )

@@ -5,7 +5,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,8 +20,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.fosents.kotlinvendingmachine.R
 import com.fosents.kotlinvendingmachine.sound.SoundManager
+import com.fosents.kotlinvendingmachine.ui.theme.BackgroundColor
 import com.fosents.kotlinvendingmachine.ui.theme.Typography
-import com.fosents.kotlinvendingmachine.ui.theme.backgroundColor
 
 @Composable
 fun ShowOutOfOrderAlert(onClick: () -> Unit) {
@@ -37,14 +40,14 @@ fun ContentOutOfOrder(anims: List<Float>, onClick: () -> Unit) {
             modifier = Modifier
                 .alpha(alpha = anims[0]),
             shape = RoundedCornerShape(10),
-            color = MaterialTheme.colors.backgroundColor
+            color = BackgroundColor
         ) {
             Column(
                 modifier = Modifier
                     .padding(16.dp)
             ) {
                 Text(
-                    style = Typography.h5,
+                    style = Typography.headlineSmall,
                     text = stringResource(id = R.string.alert_title_out_of_order),
                     modifier = Modifier
                         .padding(bottom = 10.dp)
@@ -52,7 +55,7 @@ fun ContentOutOfOrder(anims: List<Float>, onClick: () -> Unit) {
                     color = Color.White
                 )
                 Text(
-                    style = Typography.subtitle1,
+                    style = Typography.bodyLarge,
                     text = stringResource(id = R.string.alert_text_enter_maintenance),
                     modifier = Modifier
                         .padding(bottom = 10.dp)
@@ -65,7 +68,7 @@ fun ContentOutOfOrder(anims: List<Float>, onClick: () -> Unit) {
                     contentAlignment = Alignment.BottomEnd
                 ) {
                     Button(
-                        elevation = ButtonDefaults.elevation(
+                        elevation = ButtonDefaults.buttonElevation(
                             defaultElevation = 10.dp,
                             pressedElevation = 15.dp,
                             disabledElevation = 0.dp
@@ -74,13 +77,13 @@ fun ContentOutOfOrder(anims: List<Float>, onClick: () -> Unit) {
                             .padding(end = 16.dp)
                             .alpha(alpha = anims[3]),
                         colors = ButtonDefaults.buttonColors(
-                            backgroundColor = Color.White
+                            containerColor =  Color.White
                         ),
                         onClick = onClick,
                     ) {
                         Text(
                             text = "OK",
-                            color = MaterialTheme.colors.backgroundColor
+                            color = BackgroundColor
                         )
                     }
                 }

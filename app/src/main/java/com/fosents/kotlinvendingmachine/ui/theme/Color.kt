@@ -1,6 +1,6 @@
 package com.fosents.kotlinvendingmachine.ui.theme
 
-import androidx.compose.material.Colors
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
@@ -13,6 +13,6 @@ val Teal700 = Color(0xFF018786)
 val Teal900 = Color(0xFF006564)
 val Gold = Color(0xFFFBC02D)
 
-val Colors.backgroundColor: Color
+val BackgroundColor: Color
 @Composable
-get() = if (isLight) Teal500 else Teal900
+get() = if (isSystemInDarkTheme()) Teal900 else Teal200

@@ -11,6 +11,12 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -34,6 +40,7 @@ import com.fosents.kotlinvendingmachine.ui.alert.ShowOrderCancelledAlert
 import com.fosents.kotlinvendingmachine.ui.theme.*
 import java.util.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoinsScreen(
     navHostController: NavHostController,
@@ -90,7 +97,7 @@ fun CoinsScreen(
     ) { paddingValues ->
         Box(
             modifier = Modifier
-                .background(color = MaterialTheme.colors.backgroundColor)
+                .background(color = BackgroundColor)
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
@@ -145,7 +152,7 @@ fun ProductInfoBox(product: Product?, insertedCoins: String) {
             product?.name?.let {
                 Text(
                     text = product.name,
-                    style = Typography.h5,
+                    style = Typography.headlineSmall,
                     color = Color.White,
                     modifier = Modifier.padding(5.dp),
                     fontWeight = FontWeight.Bold
@@ -169,7 +176,7 @@ fun ProductInfoBox(product: Product?, insertedCoins: String) {
                         modifier = Modifier
                             .width(100.dp),
                         text = stringResource(id = R.string.coinsInserted),
-                        style = Typography.h6,
+                        style = Typography.titleLarge,
                         color = Color.White,
                         textAlign = TextAlign.Center
                     )
@@ -183,8 +190,8 @@ fun ProductInfoBox(product: Product?, insertedCoins: String) {
                             )
                             .padding(vertical = 5.dp),
                         text = insertedCoins,
-                        style = Typography.h4,
-                        color = MaterialTheme.colors.backgroundColor,
+                        style = Typography.headlineLarge,
+                        color = BackgroundColor,
                         textAlign = TextAlign.Center,
                     )
                 }
@@ -197,7 +204,7 @@ fun ProductInfoBox(product: Product?, insertedCoins: String) {
                         modifier = Modifier
                             .width(100.dp),
                         text = stringResource(id = R.string.productPrice),
-                        style = Typography.h6,
+                        style = Typography.titleLarge,
                         color = Color.White,
                         textAlign = TextAlign.Center
                     )
@@ -211,8 +218,8 @@ fun ProductInfoBox(product: Product?, insertedCoins: String) {
                             )
                             .padding(vertical = 5.dp),
                         text = String.format(Locale.CANADA, "%.2f", product?.price),
-                        style = Typography.h4,
-                        color = MaterialTheme.colors.backgroundColor,
+                        style = Typography.headlineLarge,
+                        color = BackgroundColor,
                         textAlign = TextAlign.Center,
                     )
                 }
@@ -252,14 +259,14 @@ fun CoinsCard(
         Button(
             onClick = onClick,
             interactionSource = interactionSource,
-            elevation = ButtonDefaults.elevation(
+            elevation = ButtonDefaults.buttonElevation(
                 defaultElevation = 10.dp,
                 pressedElevation = 15.dp,
                 disabledElevation = 0.dp
             ),
             shape = CircleShape,
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = Gold
+                containerColor = Gold
             ),
             modifier = Modifier
                 .size(100.dp)
@@ -268,7 +275,7 @@ fun CoinsCard(
         ) {
             Text(
                 text = String.format(Locale.CANADA, "%.2f", coin.price),
-                style = Typography.h6,
+                style = Typography.titleLarge,
                 color = Color.White,
                 maxLines = 1
             )

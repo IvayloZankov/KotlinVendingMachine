@@ -1,13 +1,17 @@
 package com.fosents.kotlinvendingmachine.ui.screen
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,9 +33,10 @@ import com.fosents.kotlinvendingmachine.ui.alert.ShowOutOfOrderAlert
 import com.fosents.kotlinvendingmachine.ui.theme.Gold
 import com.fosents.kotlinvendingmachine.ui.theme.Teal700
 import com.fosents.kotlinvendingmachine.ui.theme.Typography
-import com.fosents.kotlinvendingmachine.ui.theme.backgroundColor
+import com.fosents.kotlinvendingmachine.ui.theme.BackgroundColor
 import java.util.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductsScreen(
     navController: NavHostController,
@@ -70,7 +75,7 @@ fun ProductsScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = MaterialTheme.colors.backgroundColor)
+                .background(color = BackgroundColor)
                 .padding(paddingValues),
 //            contentAlignment = Alignment.Center
         ) {
@@ -89,7 +94,7 @@ fun ProductsScreen(
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        style = Typography.h3,
+                        style = Typography.displaySmall,
                         text = stringResource(id = R.string.alert_title_out_of_products),
                         modifier = Modifier
                             .padding(bottom = 10.dp),
@@ -135,21 +140,21 @@ fun ProductCard(
             selected = true
             onClick()
         }},
-        elevation =  ButtonDefaults.elevation(
+        elevation =  ButtonDefaults.buttonElevation(
             defaultElevation = 10.dp,
             pressedElevation = 15.dp,
             disabledElevation = 0.dp
         ),
         shape = RoundedCornerShape(20.dp),
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = color),
+            containerColor = color),
         modifier = Modifier
             .padding(top = 20.dp, start = 5.dp, end = 5.dp)) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = product.name,
-                style = Typography.h6,
+                style = Typography.titleLarge,
                 color = Teal700,
                 modifier = Modifier.padding(5.dp),
                 maxLines = 1,
@@ -157,7 +162,7 @@ fun ProductCard(
             )
             Text(
                 text = if (product.quantity > 0) String.format(Locale.CANADA, "%.2f", product.price) else stringResource(id = R.string.noQuantity).uppercase(),
-                style = Typography.body1,
+                style = Typography.bodyLarge,
                 color = Teal700,
                 modifier = Modifier.padding(5.dp),
                 maxLines = 1

@@ -5,7 +5,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,8 +19,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.fosents.kotlinvendingmachine.R
+import com.fosents.kotlinvendingmachine.ui.theme.BackgroundColor
 import com.fosents.kotlinvendingmachine.ui.theme.Typography
-import com.fosents.kotlinvendingmachine.ui.theme.backgroundColor
 
 @Composable
 fun NoConnectionAlert(onClick: () -> Unit) {
@@ -35,13 +38,13 @@ fun ContentNoConn(anims: List<Float>, onClick: () -> Unit) {
             modifier = Modifier
                 .alpha(alpha = anims[0]),
             shape = RoundedCornerShape(10),
-            color = MaterialTheme.colors.backgroundColor
+            color = BackgroundColor
         ) {
             Column(
                 modifier = Modifier.padding(16.dp)
             ) {
                 Text(
-                    style = Typography.h5,
+                    style = Typography.headlineSmall,
                     text = stringResource(id = R.string.no_internet),
                     modifier = Modifier
                         .padding(bottom = 10.dp)
@@ -49,7 +52,7 @@ fun ContentNoConn(anims: List<Float>, onClick: () -> Unit) {
                     color = Color.White
                 )
                 Text(
-                    style = Typography.subtitle1,
+                    style = Typography.bodyLarge,
                     text = stringResource(id = R.string.check_connection),
                     modifier = Modifier
                         .padding(bottom = 10.dp)
@@ -61,7 +64,7 @@ fun ContentNoConn(anims: List<Float>, onClick: () -> Unit) {
                     contentAlignment = Alignment.BottomEnd
                 ) {
                     Button(
-                        elevation =  ButtonDefaults.elevation(
+                        elevation =  ButtonDefaults.buttonElevation(
                             defaultElevation = 10.dp,
                             pressedElevation = 15.dp,
                             disabledElevation = 0.dp
@@ -70,13 +73,13 @@ fun ContentNoConn(anims: List<Float>, onClick: () -> Unit) {
                             .padding(end = 10.dp)
                             .alpha(alpha = anims[3]),
                         colors = ButtonDefaults.buttonColors(
-                            backgroundColor = Color.White
+                            containerColor = Color.White
                         ),
                         onClick = onClick,
                     ) {
                         Text(
                             text = "RETRY",
-                            color = MaterialTheme.colors.backgroundColor
+                            color = BackgroundColor
                         )
                     }
                 }
