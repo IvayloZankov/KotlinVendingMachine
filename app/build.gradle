@@ -14,8 +14,8 @@ android {
         applicationId "com.fosents.kotlinvendingmachine"
         minSdk 21
         targetSdk 33
-        versionCode 5
-        versionName "2.0"
+        versionCode 6
+        versionName "2.01"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
