@@ -25,6 +25,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.fosents.kotlinvendingmachine.R
+import com.fosents.kotlinvendingmachine.data.remote.utils.ExceptionHandler.stateFlowError
 import com.fosents.kotlinvendingmachine.model.Product
 import com.fosents.kotlinvendingmachine.navigation.Screen
 import com.fosents.kotlinvendingmachine.sound.SoundManager
@@ -42,27 +43,34 @@ fun ProductsScreen(
     navController: NavHostController,
     productsViewModel: ProductsViewModel = hiltViewModel()) {
     val showDialog = remember { mutableStateOf(true) }
+    val showErrorDialog = remember { mutableStateOf(false) }
 
     val products by productsViewModel.getProducts.collectAsState(initial = emptyList())
     val outOfOrder = productsViewModel.outOfOrder.collectAsState()
-    val noConnection = productsViewModel.noConnection.collectAsState()
+    val stateFlowError = stateFlowError.collectAsState()
     val isLoading = productsViewModel.isLoading.collectAsState()
 
     productsViewModel.fetchCoins()
 
-    if (noConnection.value) {
+    stateFlowError.value.getContentIfNotHandled()?.let {
+        showErrorDialog.value = true
+    }
+
+    if (showErrorDialog.value) {
         NoConnectionAlert {
+            showErrorDialog.value = false
             productsViewModel.fetchRemoteData()
         }
     }
 
-    if (outOfOrder.value)
+    if (outOfOrder.value) {
         if (showDialog.value) {
             ShowOutOfOrderAlert {
                 showDialog.value = false
                 navController.navigate(Screen.Maintenance.route)
             }
         }
+    }
 
     Scaffold(
         topBar = {

@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.fosents.kotlinvendingmachine.R
+import com.fosents.kotlinvendingmachine.data.remote.utils.ExceptionHandler
 import com.fosents.kotlinvendingmachine.model.Coin
 import com.fosents.kotlinvendingmachine.model.Product
 import com.fosents.kotlinvendingmachine.sound.SoundManager
@@ -48,6 +49,7 @@ fun CoinsScreen(
 
     var coinsAlpha by rememberSaveable { mutableStateOf(1f) }
     val showDialog = remember { mutableStateOf(true) }
+    val showErrorDialog = remember { mutableStateOf(false) }
 
     val selectedProduct = coinsViewModel.selectedProduct.collectAsState()
     val coinsStorage = coinsViewModel.coinsStorage.collectAsState(initial = emptyList())
@@ -57,13 +59,19 @@ fun CoinsScreen(
     val priceMet by coinsViewModel.priceMet.collectAsState()
     val changeCalculated = coinsViewModel.changeCalculated.collectAsState()
     val orderCancelled = coinsViewModel.orderCancelled.collectAsState()
-    val noConnection = coinsViewModel.noConnection.collectAsState()
+    val stateFlowError = ExceptionHandler.stateFlowError.collectAsState()
 
-    if (noConnection.value) {
+    stateFlowError.value.getContentIfNotHandled()?.let {
+        showErrorDialog.value = true
+    }
+
+    if (showErrorDialog.value) {
         NoConnectionAlert {
-            coinsViewModel.resetNoConnection()
+            showErrorDialog.value = false
         }
-    } else if (priceMet) {
+    }
+
+    if (priceMet && !showErrorDialog.value) {
         coinsAlpha = 0.5f
         if (!changeCalculated.value) coinsViewModel.addUserCoins()
         else if (showDialog.value) {
@@ -269,13 +277,13 @@ fun CoinsCard(
                 containerColor = Gold
             ),
             modifier = Modifier
-                .size(100.dp)
+                .size(140.dp)
                 .padding(top = 20.dp, start = 10.dp, end = 10.dp),
             border = BorderStroke(2.dp, Color.White)
         ) {
             Text(
                 text = String.format(Locale.CANADA, "%.2f", coin.price),
-                style = Typography.titleLarge,
+                style = Typography.headlineLarge,
                 color = Color.White,
                 maxLines = 1
             )

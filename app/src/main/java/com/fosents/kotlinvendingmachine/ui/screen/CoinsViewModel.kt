@@ -7,59 +7,49 @@ import com.fosents.kotlinvendingmachine.calc.getCoinsForReturn
 import com.fosents.kotlinvendingmachine.calc.insertCoin
 import com.fosents.kotlinvendingmachine.calc.insertUserCoins
 import com.fosents.kotlinvendingmachine.data.DataRepo
+import com.fosents.kotlinvendingmachine.data.remote.utils.request
 import com.fosents.kotlinvendingmachine.model.Coin
 import com.fosents.kotlinvendingmachine.model.Product
 import com.fosents.kotlinvendingmachine.util.Constants.ARG_PRODUCT_ID
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import java.io.IOException
-import java.lang.Exception
 import java.math.BigDecimal
 import javax.inject.Inject
 
 @HiltViewModel
-class CoinsViewModel  @Inject constructor(
+class CoinsViewModel @Inject constructor(
     private val dataRepo: DataRepo,
     savedStateHandle: SavedStateHandle
 ): ViewModel() {
 
     private val _coinsStorage = MutableStateFlow<List<Coin>>(emptyList())
-    val coinsStorage: StateFlow<List<Coin>> = _coinsStorage
+    val coinsStorage = _coinsStorage.asStateFlow()
 
     private val _selectedProduct = MutableStateFlow<Product?>(null)
-    val selectedProduct: StateFlow<Product?> = _selectedProduct
+    val selectedProduct = _selectedProduct.asStateFlow()
 
     private val _insertedAmount = MutableStateFlow("0.00")
-    val insertedAmount: StateFlow<String> = _insertedAmount
+    val insertedAmount = _insertedAmount.asStateFlow()
 
     private val coinsUser = mutableListOf<Coin>()
     val coinsForReturn = mutableListOf<Coin>()
 
     private val _priceMet = MutableStateFlow(false)
-    val priceMet: StateFlow<Boolean> = _priceMet
+    val priceMet = _priceMet.asStateFlow()
 
     private val _changeCalculated = MutableStateFlow(false)
-    val changeCalculated: StateFlow<Boolean> = _changeCalculated
+    val changeCalculated = _changeCalculated.asStateFlow()
 
     private val _orderCancelled = MutableStateFlow(false)
-    val orderCancelled: StateFlow<Boolean> = _orderCancelled
-
-    private val _noConnection = MutableStateFlow(false)
-    val noConnection: StateFlow<Boolean> = _noConnection
+    val orderCancelled = _orderCancelled.asStateFlow()
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.request {
             val productId = savedStateHandle.get<Int>(ARG_PRODUCT_ID)
-            try {
-                _selectedProduct.value = productId?.let {
-                    dataRepo.getSelectedProduct(it)
-                }
-                _coinsStorage.value = dataRepo.getCoins()
-            } catch (e: Exception) {
-                e.printStackTrace()
+            _selectedProduct.value = productId?.let {
+                dataRepo.getSelectedProduct(it)
             }
+            _coinsStorage.value = dataRepo.getCoins()
         }
     }
 
@@ -72,27 +62,22 @@ class CoinsViewModel  @Inject constructor(
     }
 
     fun addUserCoins() {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                selectedProduct.value?.let {
-                    val product = it.copy(quantity = it.quantity.minus(1))
-                    dataRepo.updateProduct(product)
-                }
-                insertUserCoins(coinsUser, _coinsStorage.value)
-                coinsUser.clear()
-                selectedProduct.value?.let {
-                    coinsForReturn.addAll(getCoinsForReturn(
-                        insertedAmount.value,
-                        it.price,
-                        _coinsStorage.value
-                    ))
-                    _changeCalculated.value = true
-                }
-                dataRepo.updateCoins(_coinsStorage.value)
-            } catch (e: IOException) {
-                e.printStackTrace()
-                _noConnection.value = true
+        viewModelScope.request {
+            selectedProduct.value?.let {
+                val product = it.copy(quantity = it.quantity.minus(1))
+                dataRepo.updateProduct(product)
             }
+            insertUserCoins(coinsUser, _coinsStorage.value)
+            coinsUser.clear()
+            selectedProduct.value?.let {
+                coinsForReturn.addAll(getCoinsForReturn(
+                    insertedAmount.value,
+                    it.price,
+                    _coinsStorage.value
+                ))
+                _changeCalculated.value = true
+            }
+            dataRepo.updateCoins(_coinsStorage.value)
         }
     }
 
@@ -100,9 +85,5 @@ class CoinsViewModel  @Inject constructor(
         coinsForReturn.addAll(coinsUser)
         coinsUser.clear()
         _orderCancelled.value = true
-    }
-
-    fun resetNoConnection() {
-        _noConnection.value = false
     }
 }

@@ -24,6 +24,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.fosents.kotlinvendingmachine.R
+import com.fosents.kotlinvendingmachine.data.remote.utils.ExceptionHandler
 import com.fosents.kotlinvendingmachine.sound.SoundManager
 import com.fosents.kotlinvendingmachine.ui.alert.NoConnectionAlert
 import com.fosents.kotlinvendingmachine.ui.theme.BackgroundColor
@@ -37,18 +38,23 @@ fun MaintenanceScreen(
     navController: NavHostController,
     maintenanceViewModel: MaintenanceViewModel = hiltViewModel()) {
 
-    val noConnection = maintenanceViewModel.noConnection.collectAsState()
+    val stateFlowError = ExceptionHandler.stateFlowError.collectAsState()
+    val showErrorDialog = remember { mutableStateOf(false) }
+
+    stateFlowError.value.getContentIfNotHandled()?.let {
+        showErrorDialog.value = true
+    }
+
+    if (showErrorDialog.value) {
+        NoConnectionAlert {
+            showErrorDialog.value = false
+        }
+    }
 
     val options = listOf(
         stringResource(id = R.string.maintenance_products_reset),
         stringResource(id = R.string.maintenance_coins_reset)
     )
-
-    if (noConnection.value) {
-        NoConnectionAlert {
-            maintenanceViewModel.resetNoConnection()
-        }
-    }
 
     Scaffold(
         topBar = {
