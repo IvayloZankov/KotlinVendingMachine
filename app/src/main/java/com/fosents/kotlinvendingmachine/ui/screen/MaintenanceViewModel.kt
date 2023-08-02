@@ -1,7 +1,6 @@
 package com.fosents.kotlinvendingmachine.ui.screen
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fosents.kotlinvendingmachine.R
 import com.fosents.kotlinvendingmachine.data.DataRepo
@@ -11,10 +10,23 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MaintenanceViewModel @Inject constructor(
-    application: Application,
     private val dataRepo: DataRepo
-): AndroidViewModel(application) {
+): ViewModel() {
 
+    private val _noConnection = MutableStateFlow(false)
+    val noConnection: StateFlow<Boolean> = _noConnection
+
+    fun initReset(resource: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                if (resource == R.string.maintenance_products_reset) {
+                    dataRepo.resetProducts()
+                } else if (resource == R.string.maintenance_coins_reset) {
+                    dataRepo.resetCoins()
+                }
+            } catch (e: IOException) {
+                e.printStackTrace()
+                _noConnection.value = true
     fun initReset(s: String) {
         viewModelScope.request {
             if (s == getApplication<Application>().getString(R.string.maintenance_products_reset)) {

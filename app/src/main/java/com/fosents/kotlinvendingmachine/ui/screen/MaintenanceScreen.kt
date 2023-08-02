@@ -52,8 +52,8 @@ fun MaintenanceScreen(
     }
 
     val options = listOf(
-        stringResource(id = R.string.maintenance_products_reset),
-        stringResource(id = R.string.maintenance_coins_reset)
+        R.string.maintenance_products_reset,
+        R.string.maintenance_coins_reset
     )
 
     Scaffold(
@@ -86,7 +86,7 @@ fun MaintenanceScreen(
 
 @Composable
 fun MaintenanceCard(
-    option: String,
+    resource: Int,
     onClick: () -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -112,7 +112,7 @@ fun MaintenanceCard(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = option,
+                text = stringResource(id = resource),
                 style = Typography.titleLarge,
                 color = Teal700,
                 modifier = Modifier.padding(5.dp),
@@ -132,5 +132,5 @@ fun PreviewMaintenanceScreen() {
 @Preview
 @Composable
 fun PreviewMaintenanceCard() {
-    MaintenanceCard(stringResource(id = R.string.maintenance_products_reset)) {}
+    MaintenanceCard(R.string.maintenance_products_reset) {}
 }
