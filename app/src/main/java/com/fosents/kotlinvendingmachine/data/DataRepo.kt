@@ -23,7 +23,7 @@ class DataRepo @Inject constructor(
         remote.fetchRemoteData()
     }
 
-    fun getProducts(): Flow<List<Product>> {
+    suspend fun getProducts(): List<Product> {
         return remote.getProducts()
     }
 

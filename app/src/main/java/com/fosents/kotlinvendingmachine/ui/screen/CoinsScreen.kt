@@ -10,13 +10,18 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -29,8 +34,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.fosents.kotlinvendingmachine.R
+import com.fosents.kotlinvendingmachine.data.DataRepo
+import com.fosents.kotlinvendingmachine.data.FakeRemoteDataSourceImpl
+import com.fosents.kotlinvendingmachine.data.local.FakeDataStoreOperations
 import com.fosents.kotlinvendingmachine.data.remote.utils.ExceptionHandler
 import com.fosents.kotlinvendingmachine.model.Coin
 import com.fosents.kotlinvendingmachine.model.Product
@@ -39,7 +49,32 @@ import com.fosents.kotlinvendingmachine.ui.alert.NoConnectionAlert
 import com.fosents.kotlinvendingmachine.ui.alert.ShowGetProductAlert
 import com.fosents.kotlinvendingmachine.ui.alert.ShowOrderCancelledAlert
 import com.fosents.kotlinvendingmachine.ui.theme.*
+import com.fosents.kotlinvendingmachine.util.Constants.ARG_PRODUCT_ID
 import java.util.*
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CoinsTopBar(onIconClick: () -> Unit) {
+    TopAppBar(
+        title = {
+            Text(
+                text = stringResource(R.string.app_name),
+                color = Color.White
+            )
+        },
+        colors = TopAppBarDefaults.smallTopAppBarColors(
+            containerColor = BackgroundColor,
+        ),
+        actions = {
+            IconButton(onClick = onIconClick) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    tint = Color.White,
+                    contentDescription = stringResource(id = R.string.back_button)
+                )
+            }
+        })
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,7 +82,7 @@ fun CoinsScreen(
     navHostController: NavHostController,
     coinsViewModel: CoinsViewModel = hiltViewModel()) {
 
-    var coinsAlpha by rememberSaveable { mutableStateOf(1f) }
+    var coinsAlpha by rememberSaveable { mutableFloatStateOf(1f) }
     val showDialog = remember { mutableStateOf(true) }
     val showErrorDialog = remember { mutableStateOf(false) }
 
@@ -291,25 +326,14 @@ fun CoinsCard(
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
-fun PreviewInfoBox() {
-    ProductInfoBox(product = Product(1, "Water", 11.20, 4), "0.00")
-}
-
-@Preview
-@Composable
-fun PreviewCoinsBox() {
-    CoinsGrid(1f, listOf(
-        Coin(1, "five_cents", 0.05, 4),
-        Coin(2, "fifty_cents", 0.50, 4),
-        Coin(3, "one_eur", 1.00, 4),
-        Coin(4, "two_eur", 2.00, 4)
-    )) {}
-}
-
-@Preview
-@Composable
-fun PreviewCoinsCard() {
-    CoinsCard(Coin(1, "five_cents", 0.05, 4)) {}
+fun PreviewCoinsScreen() {
+    CoinsScreen(
+        rememberNavController(),
+        coinsViewModel = CoinsViewModel(
+            DataRepo(FakeRemoteDataSourceImpl(), FakeDataStoreOperations()),
+            savedStateHandle = SavedStateHandle(mapOf(ARG_PRODUCT_ID to 1))
+        )
+    )
 }

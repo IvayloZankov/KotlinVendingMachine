@@ -6,12 +6,17 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,6 +29,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.fosents.kotlinvendingmachine.R
+import com.fosents.kotlinvendingmachine.data.DataRepo
+import com.fosents.kotlinvendingmachine.data.FakeRemoteDataSourceImpl
+import com.fosents.kotlinvendingmachine.data.local.FakeDataStoreOperations
 import com.fosents.kotlinvendingmachine.data.remote.utils.ExceptionHandler
 import com.fosents.kotlinvendingmachine.sound.SoundManager
 import com.fosents.kotlinvendingmachine.ui.alert.NoConnectionAlert
@@ -34,9 +42,34 @@ import com.fosents.kotlinvendingmachine.ui.theme.Typography
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+fun MaintenanceTopBar(onIconClick: () -> Unit) {
+    TopAppBar(
+        title = {
+            Text(
+                text = stringResource(R.string.app_name),
+                color = Color.White
+            )
+        },
+        colors = TopAppBarDefaults.smallTopAppBarColors(
+            containerColor = BackgroundColor,
+        ),
+        actions = {
+            IconButton(onClick = onIconClick) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    tint = Color.White,
+                    contentDescription = stringResource(id = R.string.back_button)
+                )
+            }
+        })
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun MaintenanceScreen(
     navController: NavHostController,
-    maintenanceViewModel: MaintenanceViewModel = hiltViewModel()) {
+    maintenanceViewModel: MaintenanceViewModel = hiltViewModel()
+) {
 
     val stateFlowError = ExceptionHandler.stateFlowError.collectAsState()
     val showErrorDialog = remember { mutableStateOf(false) }
@@ -123,14 +156,13 @@ fun MaintenanceCard(
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun PreviewMaintenanceScreen() {
-    MaintenanceScreen(rememberNavController())
-}
-
-@Preview
-@Composable
-fun PreviewMaintenanceCard() {
-    MaintenanceCard(R.string.maintenance_products_reset) {}
+    MaintenanceScreen(
+        rememberNavController(),
+        maintenanceViewModel = MaintenanceViewModel(
+            DataRepo(FakeRemoteDataSourceImpl(), FakeDataStoreOperations())
+        )
+    )
 }

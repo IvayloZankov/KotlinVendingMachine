@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 interface ProductsDao {
 
     @Query("SELECT * FROM product_table ORDER BY id ASC")
-    fun getProducts(): Flow<List<Product>>
+    fun getProducts(): List<Product>
 
     @Query("SELECT * FROM product_table WHERE id=:productId")
     suspend fun getSelectedProduct(productId: Int): Product

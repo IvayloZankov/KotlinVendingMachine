@@ -5,13 +5,18 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,6 +30,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.fosents.kotlinvendingmachine.R
+import com.fosents.kotlinvendingmachine.data.DataRepo
+import com.fosents.kotlinvendingmachine.data.FakeRemoteDataSourceImpl
+import com.fosents.kotlinvendingmachine.data.local.FakeDataStoreOperations
 import com.fosents.kotlinvendingmachine.data.remote.utils.ExceptionHandler.stateFlowError
 import com.fosents.kotlinvendingmachine.model.Product
 import com.fosents.kotlinvendingmachine.navigation.Screen
@@ -39,17 +47,43 @@ import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+fun ProductsTopBar(onMaintenanceClicked: () -> Unit) {
+    TopAppBar(
+        title = {
+            Text(
+                text = stringResource(R.string.app_name),
+                color = Color.White
+            )
+        },
+        colors = TopAppBarDefaults.smallTopAppBarColors(
+            containerColor = BackgroundColor,
+        ),
+        actions = {
+            IconButton(onClick = onMaintenanceClicked) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    tint = Color.White,
+                    contentDescription = stringResource(id = R.string.maintenance_button)
+                )
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun ProductsScreen(
     navController: NavHostController,
     productsViewModel: ProductsViewModel = hiltViewModel()) {
     val showDialog = remember { mutableStateOf(true) }
     val showErrorDialog = remember { mutableStateOf(false) }
 
-    val products by productsViewModel.getProducts.collectAsState(initial = emptyList())
+    val products = productsViewModel.stateFlowProducts.collectAsState(initial = emptyList())
     val outOfOrder = productsViewModel.outOfOrder.collectAsState()
     val stateFlowError = stateFlowError.collectAsState()
     val isLoading = productsViewModel.isLoading.collectAsState()
 
+    productsViewModel.fetchProducts()
     productsViewModel.fetchCoins()
 
     stateFlowError.value.getContentIfNotHandled()?.let {
@@ -84,8 +118,7 @@ fun ProductsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(color = BackgroundColor)
-                .padding(paddingValues),
-//            contentAlignment = Alignment.Center
+                .padding(paddingValues)
         ) {
             if (isLoading.value) {
                 Box(
@@ -96,7 +129,7 @@ fun ProductsScreen(
                         color = Color.White
                     )
                 }
-            } else if (products.isEmpty()) {
+            } else if (products.value.isEmpty()) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center,
@@ -111,7 +144,7 @@ fun ProductsScreen(
                     )
                 }
             } else {
-                ProductsGrid(navController, products)
+                ProductsGrid(navController, products.value)
             }
         }
     }
@@ -179,18 +212,13 @@ fun ProductCard(
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
-fun PreviewProductsGrid() {
-    ProductsGrid(rememberNavController(), listOf(
-        Product(1, "Water", 1.2, 4),
-        Product(2, "Coca Cola", 0.9, 0),
-        Product(3, "Mineral Water", 0.5, 4),
-        Product(4, "Long name product", 0.7, 4)))
-}
-
-@Preview
-@Composable
-fun PreviewProductCard() {
-    ProductCard(Product(1, "Water", 1.25, 4)) {}
+fun PreviewProductsScreen() {
+    ProductsScreen(
+        rememberNavController(),
+        productsViewModel = ProductsViewModel(
+            DataRepo(FakeRemoteDataSourceImpl(), FakeDataStoreOperations())
+        )
+    )
 }

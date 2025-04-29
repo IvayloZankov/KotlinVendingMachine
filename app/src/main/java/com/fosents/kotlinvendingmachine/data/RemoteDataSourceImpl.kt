@@ -5,7 +5,6 @@ import com.fosents.kotlinvendingmachine.data.mediator.VendingMediator
 import com.fosents.kotlinvendingmachine.data.remote.VendingApi
 import com.fosents.kotlinvendingmachine.model.Coin
 import com.fosents.kotlinvendingmachine.model.Product
-import kotlinx.coroutines.flow.Flow
 
 class RemoteDataSourceImpl(
     vendingApi: VendingApi,
@@ -20,7 +19,7 @@ class RemoteDataSourceImpl(
         vendingMediator.fetchRemoteData()
     }
 
-    override fun getProducts(): Flow<List<Product>> {
+    override suspend fun getProducts(): List<Product> {
         return productsDao.getProducts()
     }
 
