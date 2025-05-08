@@ -86,14 +86,14 @@ fun CoinsScreen(
     val showDialog = remember { mutableStateOf(true) }
     val showErrorDialog = remember { mutableStateOf(false) }
 
-    val selectedProduct = coinsViewModel.selectedProduct.collectAsState()
-    val coinsStorage = coinsViewModel.coinsStorage.collectAsState(initial = emptyList())
+    val selectedProduct = coinsViewModel.stateFlowSelectedProduct.collectAsState()
+    val coinsStorage = coinsViewModel.stateFlowCoinsStorage.collectAsState(initial = emptyList())
 
-    val insertedAmount = coinsViewModel.insertedAmount.collectAsState()
+    val insertedAmount = coinsViewModel.stateFlowInsertedAmount.collectAsState()
 
-    val priceMet by coinsViewModel.priceMet.collectAsState()
-    val changeCalculated = coinsViewModel.changeCalculated.collectAsState()
-    val orderCancelled = coinsViewModel.orderCancelled.collectAsState()
+    val priceMet by coinsViewModel.stateFlowPriceMet.collectAsState()
+    val changeCalculated = coinsViewModel.stateFlowChangeCalculated.collectAsState()
+    val orderCancelled = coinsViewModel.stateflowOrderCancelled.collectAsState()
     val stateFlowError = ExceptionHandler.stateFlowError.collectAsState()
 
     stateFlowError.value.getContentIfNotHandled()?.let {
@@ -110,7 +110,7 @@ fun CoinsScreen(
         coinsAlpha = 0.5f
         if (!changeCalculated.value) coinsViewModel.addUserCoins()
         else if (showDialog.value) {
-            ShowGetProductAlert(coinsViewModel.coinsForReturn) {
+            ShowGetProductAlert(coinsViewModel.mutableListCoinsForReturn) {
                 showDialog.value = false
                 SoundManager.getInstance().playClick()
                 navHostController.popBackStack()
@@ -120,7 +120,7 @@ fun CoinsScreen(
 
     if (orderCancelled.value)
         if (showDialog.value) {
-            ShowOrderCancelledAlert(coinsViewModel.coinsForReturn) {
+            ShowOrderCancelledAlert(coinsViewModel.mutableListCoinsForReturn) {
                 showDialog.value = false
                 SoundManager.getInstance().playClick()
                 navHostController.popBackStack()

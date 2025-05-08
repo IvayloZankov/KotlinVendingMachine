@@ -22,68 +22,69 @@ class CoinsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ): ViewModel() {
 
-    private val _coinsStorage = MutableStateFlow<List<Coin>>(emptyList())
-    val coinsStorage = _coinsStorage.asStateFlow()
+    private val _stateFlowCoinsStorage = MutableStateFlow<List<Coin>>(emptyList())
+    val stateFlowCoinsStorage = _stateFlowCoinsStorage.asStateFlow()
 
-    private val _selectedProduct = MutableStateFlow<Product?>(null)
-    val selectedProduct = _selectedProduct.asStateFlow()
+    private val _stateFlowSelectedProduct = MutableStateFlow<Product?>(null)
+    val stateFlowSelectedProduct = _stateFlowSelectedProduct.asStateFlow()
 
-    private val _insertedAmount = MutableStateFlow("0.00")
-    val insertedAmount = _insertedAmount.asStateFlow()
+    private val _stateFlowInsertedAmount = MutableStateFlow("0.00")
+    val stateFlowInsertedAmount = _stateFlowInsertedAmount.asStateFlow()
 
-    private val coinsUser = mutableListOf<Coin>()
-    val coinsForReturn = mutableListOf<Coin>()
+    private val mutableListCoinsUser = mutableListOf<Coin>()
+    val mutableListCoinsForReturn = mutableListOf<Coin>()
 
-    private val _priceMet = MutableStateFlow(false)
-    val priceMet = _priceMet.asStateFlow()
+    private val _stateFlowPriceMet = MutableStateFlow(false)
+    val stateFlowPriceMet = _stateFlowPriceMet.asStateFlow()
 
-    private val _changeCalculated = MutableStateFlow(false)
-    val changeCalculated = _changeCalculated.asStateFlow()
+    private val _stateFlowChangeCalculated = MutableStateFlow(false)
+    val stateFlowChangeCalculated = _stateFlowChangeCalculated.asStateFlow()
 
-    private val _orderCancelled = MutableStateFlow(false)
-    val orderCancelled = _orderCancelled.asStateFlow()
+    private val _stateFlowOrderCancelled = MutableStateFlow(false)
+    val stateflowOrderCancelled = _stateFlowOrderCancelled.asStateFlow()
 
     init {
         viewModelScope.request {
             val productId = savedStateHandle.get<Int>(ARG_PRODUCT_ID)
-            _selectedProduct.value = productId?.let {
+            _stateFlowSelectedProduct.value = productId?.let {
                 dataRepo.getSelectedProduct(it)
             }
-            _coinsStorage.value = dataRepo.getCoins()
+            _stateFlowCoinsStorage.value = dataRepo.getCoins()
         }
     }
 
     fun addUserCoin(it: Coin) {
-        _insertedAmount.value =
-            BigDecimal(_insertedAmount.value).add(BigDecimal.valueOf(it.price)).toString()
+        _stateFlowInsertedAmount.value =
+            BigDecimal(_stateFlowInsertedAmount.value).add(BigDecimal.valueOf(it.price)).toString()
         val coinUser = it.copy(quantity = 1)
-        insertCoin(coinUser, coinsUser)
-        _priceMet.value = insertedAmount.value.toDouble() >= selectedProduct.value!!.price
+        insertCoin(coinUser, mutableListCoinsUser)
+        _stateFlowPriceMet.value = stateFlowInsertedAmount.value.toDouble() >= stateFlowSelectedProduct.value!!.price
     }
 
     fun addUserCoins() {
         viewModelScope.request {
-            selectedProduct.value?.let {
+            stateFlowSelectedProduct.value?.let {
                 val product = it.copy(quantity = it.quantity.minus(1))
                 dataRepo.updateProduct(product)
             }
-            insertUserCoins(coinsUser, _coinsStorage.value)
-            coinsUser.clear()
-            selectedProduct.value?.let {
-                coinsForReturn.addAll(getCoinsForReturn(
-                    insertedAmount.value,
+
+            insertUserCoins(mutableListCoinsUser, _stateFlowCoinsStorage.value)
+            mutableListCoinsUser.clear()
+            stateFlowSelectedProduct.value?.let {
+                mutableListCoinsForReturn.addAll(getCoinsForReturn(
+                    stateFlowInsertedAmount.value,
                     it.price,
-                    _coinsStorage.value
+                    _stateFlowCoinsStorage.value
                 ))
-                _changeCalculated.value = true
+                _stateFlowChangeCalculated.value = true
             }
-            dataRepo.updateCoins(_coinsStorage.value)
+            dataRepo.updateCoins(_stateFlowCoinsStorage.value)
         }
     }
 
     fun cancelOrder() {
-        coinsForReturn.addAll(coinsUser)
-        coinsUser.clear()
-        _orderCancelled.value = true
+        mutableListCoinsForReturn.addAll(mutableListCoinsUser)
+        mutableListCoinsUser.clear()
+        _stateFlowOrderCancelled.value = true
     }
 }
