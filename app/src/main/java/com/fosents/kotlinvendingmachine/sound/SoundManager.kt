@@ -7,7 +7,7 @@ import com.fosents.kotlinvendingmachine.R
 
 class SoundManager {
 
-    var soundPool: SoundPool
+    private var soundPool: SoundPool
 
     private var soundClick = 0
     private var soundCoin = 0

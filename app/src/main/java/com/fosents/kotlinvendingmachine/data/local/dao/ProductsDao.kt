@@ -5,7 +5,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy.Companion.REPLACE
 import androidx.room.Query
 import com.fosents.kotlinvendingmachine.model.Product
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ProductsDao {

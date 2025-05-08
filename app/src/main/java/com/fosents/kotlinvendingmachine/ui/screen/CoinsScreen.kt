@@ -272,23 +272,6 @@ fun ProductInfoBox(product: Product?, insertedCoins: String) {
 }
 
 @Composable
-fun CoinsGrid(coinsAlpha: Float, coins: List<Coin>, updateInsertedAmount: (coin: Coin) -> Unit) {
-    LazyVerticalGrid(
-        modifier = Modifier
-            .alpha(coinsAlpha)
-            .height(200.dp),
-        columns = GridCells.Fixed(2),
-        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 32.dp),
-    ) {
-        items(coins.size) {
-            CoinsCard(coins[it]) {
-                updateInsertedAmount(coins[it])
-            }
-        }
-    }
-}
-
-@Composable
 fun CoinsCard(
     coin: Coin,
     onClick: () -> Unit
