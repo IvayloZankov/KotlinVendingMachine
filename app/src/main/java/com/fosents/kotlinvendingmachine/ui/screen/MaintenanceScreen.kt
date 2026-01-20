@@ -1,5 +1,6 @@
 package com.fosents.kotlinvendingmachine.ui.screen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -156,6 +157,7 @@ fun MaintenanceCard(
     }
 }
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true)
 @Composable
 fun PreviewMaintenanceScreen() {

@@ -1,5 +1,6 @@
 package com.fosents.kotlinvendingmachine.ui.screen
 
+import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -309,6 +310,7 @@ fun CoinsCard(
     }
 }
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true)
 @Composable
 fun PreviewCoinsScreen() {

@@ -1,5 +1,6 @@
 package com.fosents.kotlinvendingmachine.ui.screen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -212,6 +213,7 @@ fun ProductCard(
     }
 }
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true)
 @Composable
 fun PreviewProductsScreen() {
