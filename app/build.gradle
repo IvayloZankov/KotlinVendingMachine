@@ -15,12 +15,12 @@ android {
         applicationId "com.fosents.kotlinvendingmachine"
         minSdk 29
         targetSdk 36
-        versionCode 17
-        versionName "2.06"
+        versionCode 18
+        versionName "2.07"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
-            useSupportLibrary true
+            useSupportLibrary = true
         }
     }
 
@@ -35,10 +35,10 @@ android {
         targetCompatibility JavaVersion.VERSION_21
     }
     buildFeatures {
-        compose true
+        compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion libs.versions.composeCompiler.get()
+        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
     }
     packagingOptions {
         resources {
@@ -62,6 +62,8 @@ dependencies {
     debugImplementation libs.androidx.compose.ui.test.manifest
 
     implementation libs.androidx.navigation.compose
+
+    implementation libs.compose.material.icons
 
     implementation libs.androidx.room.runtime
     ksp libs.androidx.room.compiler
