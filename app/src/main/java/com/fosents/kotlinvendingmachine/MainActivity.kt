@@ -7,11 +7,11 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.fosents.kotlinvendingmachine.navigation.SetupNavGraph
 import com.fosents.kotlinvendingmachine.sound.SoundManager
 import com.fosents.kotlinvendingmachine.ui.theme.KotlinVendingMachineTheme
 import com.fosents.kotlinvendingmachine.ui.theme.VendingRippleTheme
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import dagger.hilt.android.AndroidEntryPoint
 
 @ExperimentalAnimationApi
@@ -25,7 +25,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             KotlinVendingMachineTheme {
                 CompositionLocalProvider(LocalRippleTheme provides VendingRippleTheme) {
-                    navHostController = rememberAnimatedNavController()
+                    navHostController = rememberNavController()
                     SetupNavGraph(navController = navHostController)
                 }
             }
