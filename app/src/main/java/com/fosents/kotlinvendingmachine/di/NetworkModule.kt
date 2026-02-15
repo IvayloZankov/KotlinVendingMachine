@@ -4,7 +4,6 @@ import com.fosents.kotlinvendingmachine.data.RemoteDataSource
 import com.fosents.kotlinvendingmachine.data.RemoteDataSourceImpl
 import com.fosents.kotlinvendingmachine.data.local.VendingDatabase
 import com.fosents.kotlinvendingmachine.data.remote.VendingApi
-import com.fosents.kotlinvendingmachine.util.RequestUrl.BASE_URL
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
@@ -20,6 +19,8 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
+
+    private const val BASE_URL = "https://zankov.dev/vending/"
 
     @Provides
     @Singleton

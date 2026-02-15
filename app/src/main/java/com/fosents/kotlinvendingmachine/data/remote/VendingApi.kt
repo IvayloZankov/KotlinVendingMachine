@@ -1,7 +1,7 @@
 package com.fosents.kotlinvendingmachine.data.remote
 
-import com.fosents.kotlinvendingmachine.model.Coin
-import com.fosents.kotlinvendingmachine.model.Product
+import com.fosents.kotlinvendingmachine.data.remote.dto.CoinDto
+import com.fosents.kotlinvendingmachine.data.remote.dto.ProductDto
 import com.fosents.kotlinvendingmachine.util.RequestUrl.DECREASE_PRODUCT
 import com.fosents.kotlinvendingmachine.util.RequestUrl.GET_COINS
 import com.fosents.kotlinvendingmachine.util.RequestUrl.GET_PRODUCTS
@@ -13,24 +13,24 @@ import retrofit2.http.*
 interface VendingApi {
 
     @GET(GET_PRODUCTS)
-    suspend fun getProducts(): ApiResponse<Product>
+    suspend fun getProducts(): ApiResponse<ProductDto>
 
     @FormUrlEncoded
     @POST(DECREASE_PRODUCT)
     suspend fun decreaseProduct(
         @FieldMap params: Map<String, Int>
-    ): ApiResponse<Product>
+    ): ApiResponse<ProductDto>
 
     @GET(RESET_PRODUCTS)
-    suspend fun resetProducts(): ApiResponse<Product>
+    suspend fun resetProducts(): ApiResponse<ProductDto>
 
     @GET(GET_COINS)
-    suspend fun getCoins(): ApiResponse<Coin>
+    suspend fun getCoins(): ApiResponse<CoinDto>
 
     @POST(UPDATE_COINS)
-    suspend fun updateCoins(@Body list: List<Coin>): ApiResponse<Coin>
+    suspend fun updateCoins(@Body list: List<CoinDto>): ApiResponse<CoinDto>
 
     @GET(RESET_COINS)
-    suspend fun resetCoins(): ApiResponse<Coin>
+    suspend fun resetCoins(): ApiResponse<CoinDto>
 
 }

@@ -1,10 +1,12 @@
 package com.fosents.kotlinvendingmachine.data
 
 import com.fosents.kotlinvendingmachine.data.local.VendingDatabase
+import com.fosents.kotlinvendingmachine.data.local.entity.toDomain
 import com.fosents.kotlinvendingmachine.data.mediator.VendingMediator
 import com.fosents.kotlinvendingmachine.data.remote.VendingApi
 import com.fosents.kotlinvendingmachine.model.Coin
 import com.fosents.kotlinvendingmachine.model.Product
+import kotlin.collections.map
 
 class RemoteDataSourceImpl(
     vendingApi: VendingApi,
@@ -20,11 +22,11 @@ class RemoteDataSourceImpl(
     }
 
     override suspend fun getProducts(): List<Product> {
-        return productsDao.getProducts()
+        return productsDao.getProducts().map { it.toDomain() }
     }
 
     override suspend fun getSelectedProduct(productId: Int): Product {
-        return productsDao.getSelectedProduct(productId)
+        return productsDao.getSelectedProduct(productId).toDomain()
     }
 
     override suspend fun updateProduct(product: Product) {
@@ -36,7 +38,7 @@ class RemoteDataSourceImpl(
     }
 
     override suspend fun getCoins(): List<Coin> {
-        return coinsDao.getCoins()
+        return coinsDao.getCoins().map { it.toDomain() }
     }
 
     override suspend fun updateCoins(list: List<Coin>) {
