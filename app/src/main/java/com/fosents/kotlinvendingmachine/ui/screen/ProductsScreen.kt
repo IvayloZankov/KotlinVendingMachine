@@ -1,6 +1,5 @@
 package com.fosents.kotlinvendingmachine.ui.screen
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -28,13 +27,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.fosents.kotlinvendingmachine.R
-import com.fosents.kotlinvendingmachine.data.DataRepo
 import com.fosents.kotlinvendingmachine.data.remote.utils.ExceptionHandler.stateFlowError
+import com.fosents.kotlinvendingmachine.data.remote.utils.OneTimeEvent
 import com.fosents.kotlinvendingmachine.model.Product
-import com.fosents.kotlinvendingmachine.navigation.Screen
 import com.fosents.kotlinvendingmachine.sound.SoundManager
 import com.fosents.kotlinvendingmachine.ui.alert.NoConnectionAlert
 import com.fosents.kotlinvendingmachine.ui.alert.ShowOutOfOrderAlert
@@ -43,6 +39,34 @@ import com.fosents.kotlinvendingmachine.ui.theme.Teal700
 import com.fosents.kotlinvendingmachine.ui.theme.Typography
 import com.fosents.kotlinvendingmachine.ui.theme.BackgroundColor
 import java.util.*
+
+@Composable
+fun ProductsFragment(
+    productsViewModel: ProductsViewModel = hiltViewModel(),
+    onGoMaintenanceClick: () -> Unit = {},
+    onProductClick: (Int) -> Unit = {}
+) {
+    val products by productsViewModel.stateFlowProducts.collectAsState(initial = emptyList())
+    val outOfOrder by productsViewModel.outOfOrder.collectAsState()
+    val stateFlowError by stateFlowError.collectAsState()
+    val isLoading by productsViewModel.isLoading.collectAsState()
+
+    productsViewModel.fetchProducts()
+    productsViewModel.fetchCoins()
+
+    ProductsScreen(
+        products = products,
+        outOfOrder = outOfOrder,
+        stateFlowError = stateFlowError,
+        isLoading = isLoading,
+        onRetryClick = {
+            productsViewModel.fetchRemoteData()
+        },
+        onGoMaintenanceClick = onGoMaintenanceClick,
+        onProductClick = onProductClick
+    )
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,35 +96,33 @@ fun ProductsTopBar(onMaintenanceClicked: () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductsScreen(
-    navController: NavHostController,
-    productsViewModel: ProductsViewModel = hiltViewModel()) {
+    products: List<Product>,
+    outOfOrder: Boolean,
+    stateFlowError: OneTimeEvent<Throwable>,
+    isLoading: Boolean,
+    onRetryClick: () -> Unit = {},
+    onGoMaintenanceClick: () -> Unit = {},
+    onProductClick: (Int) -> Unit = {},
+) {
     val showDialog = remember { mutableStateOf(true) }
     val showErrorDialog = remember { mutableStateOf(false) }
 
-    val products = productsViewModel.stateFlowProducts.collectAsState(initial = emptyList())
-    val outOfOrder = productsViewModel.outOfOrder.collectAsState()
-    val stateFlowError = stateFlowError.collectAsState()
-    val isLoading = productsViewModel.isLoading.collectAsState()
-
-    productsViewModel.fetchProducts()
-    productsViewModel.fetchCoins()
-
-    stateFlowError.value.getContentIfNotHandled()?.let {
+    stateFlowError.getContentIfNotHandled()?.let {
         showErrorDialog.value = true
     }
 
     if (showErrorDialog.value) {
         NoConnectionAlert {
             showErrorDialog.value = false
-            productsViewModel.fetchRemoteData()
+            onRetryClick()
         }
     }
 
-    if (outOfOrder.value) {
+    if (outOfOrder) {
         if (showDialog.value) {
             ShowOutOfOrderAlert {
                 showDialog.value = false
-                navController.navigate(Screen.Maintenance.route)
+                onGoMaintenanceClick()
             }
         }
     }
@@ -109,7 +131,7 @@ fun ProductsScreen(
         topBar = {
             ProductsTopBar {
                 SoundManager.getInstance().playClick()
-                navController.navigate(Screen.Maintenance.route)
+                onGoMaintenanceClick()
             }
         }
     ) { paddingValues ->
@@ -119,7 +141,7 @@ fun ProductsScreen(
                 .background(color = BackgroundColor)
                 .padding(paddingValues)
         ) {
-            if (isLoading.value) {
+            if (isLoading) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center,
@@ -128,7 +150,7 @@ fun ProductsScreen(
                         color = Color.White
                     )
                 }
-            } else if (products.value.isEmpty()) {
+            } else if (products.isEmpty()) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center,
@@ -143,7 +165,10 @@ fun ProductsScreen(
                     )
                 }
             } else {
-                ProductsGrid(navController, products.value)
+                ProductsGrid(
+                    products,
+                    onProductClick
+                )
             }
         }
     }
@@ -151,8 +176,8 @@ fun ProductsScreen(
 
 @Composable
 fun ProductsGrid(
-    navController: NavHostController,
     products: List<Product>,
+    onProductClick: (Int) -> Unit = {},
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -161,7 +186,7 @@ fun ProductsGrid(
         items(products.size) {
             ProductCard(products[it]) {
                 SoundManager.getInstance().playClick()
-                navController.navigate(Screen.Coins.passProductId(products[it].id))
+                onProductClick(products[it].id)
             }
         }
     }
@@ -211,14 +236,25 @@ fun ProductCard(
     }
 }
 
-//@SuppressLint("ViewModelConstructorInComposable")
-//@Preview(showBackground = true)
-//@Composable
-//fun PreviewProductsScreen() {
-//    ProductsScreen(
-//        rememberNavController(),
-//        productsViewModel = ProductsViewModel(
-//            DataRepo(FakeRemoteDataSourceImpl(), FakeDataStoreOperations())
-//        )
-//    )
-//}
+@Preview
+@Composable
+fun ProductsScreenPreview() {
+    val products = listOf(
+        Product(1, "Chips", 2.50, 10),
+        Product(2, "Soda", 1.50, 5),
+        Product(3, "Candy", 1.00, 20),
+        Product(4, "Water", 1.00, 0) // Out of stock
+    )
+    val errorEvent = OneTimeEvent(RuntimeException())
+    errorEvent.hasBeenHandled = true
+
+    ProductsScreen(
+        products = products,
+        outOfOrder = false,
+        stateFlowError = errorEvent,
+        isLoading = false,
+        onRetryClick = {},
+        onGoMaintenanceClick = {},
+        onProductClick = {}
+    )
+}

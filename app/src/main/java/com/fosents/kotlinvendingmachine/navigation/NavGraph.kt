@@ -10,8 +10,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.fosents.kotlinvendingmachine.ui.screen.CoinsFragment
-import com.fosents.kotlinvendingmachine.ui.screen.MaintenanceScreen
-import com.fosents.kotlinvendingmachine.ui.screen.ProductsScreen
+import com.fosents.kotlinvendingmachine.ui.screen.MaintenanceFragment
+import com.fosents.kotlinvendingmachine.ui.screen.ProductsFragment
 import com.fosents.kotlinvendingmachine.util.Constants.ARG_PRODUCT_ID
 
 @ExperimentalAnimationApi
@@ -44,7 +44,14 @@ fun SetupNavGraph(navController: NavHostController) {
                         fadeIn(animationSpec = tween(300))
             }
         ) {
-            ProductsScreen(navController = navController)
+            ProductsFragment(
+                onGoMaintenanceClick = {
+                    navController.navigate(Screen.Maintenance.route)
+                },
+                onProductClick = {
+                    navController.navigate(Screen.Coins.passProductId(it))
+                }
+            )
         }
         composable(
             route = Screen.Coins.route,
@@ -101,7 +108,11 @@ fun SetupNavGraph(navController: NavHostController) {
                         fadeOut(animationSpec = tween(300))
             }
         ) {
-            MaintenanceScreen(navController = navController)
+            MaintenanceFragment(
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
         }
     }
 }
