@@ -1,6 +1,5 @@
 package com.fosents.kotlinvendingmachine.ui.screen
 
-import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -35,14 +34,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.SavedStateHandle
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.fosents.kotlinvendingmachine.R
-import com.fosents.kotlinvendingmachine.data.DataRepo
-import com.fosents.kotlinvendingmachine.data.FakeRemoteDataSourceImpl
-import com.fosents.kotlinvendingmachine.data.local.FakeDataStoreOperations
 import com.fosents.kotlinvendingmachine.data.remote.utils.ExceptionHandler
+import com.fosents.kotlinvendingmachine.data.remote.utils.OneTimeEvent
 import com.fosents.kotlinvendingmachine.model.Coin
 import com.fosents.kotlinvendingmachine.model.Product
 import com.fosents.kotlinvendingmachine.sound.SoundManager
@@ -50,8 +44,48 @@ import com.fosents.kotlinvendingmachine.ui.alert.NoConnectionAlert
 import com.fosents.kotlinvendingmachine.ui.alert.ShowGetProductAlert
 import com.fosents.kotlinvendingmachine.ui.alert.ShowOrderCancelledAlert
 import com.fosents.kotlinvendingmachine.ui.theme.*
-import com.fosents.kotlinvendingmachine.util.Constants.ARG_PRODUCT_ID
 import java.util.*
+
+@Composable
+fun CoinsFragment(
+    coinsViewModel: CoinsViewModel = hiltViewModel(),
+    onAlertOkClick: () -> Unit
+) {
+
+    val selectedProduct by coinsViewModel.stateFlowSelectedProduct.collectAsState()
+    val coinsStorage by coinsViewModel.stateFlowCoinsStorage.collectAsState(initial = emptyList())
+
+    val insertedAmount by coinsViewModel.stateFlowInsertedAmount.collectAsState()
+
+    val priceMet by coinsViewModel.stateFlowPriceMet.collectAsState()
+    val changeCalculated by coinsViewModel.stateFlowChangeCalculated.collectAsState()
+    val orderCancelled by coinsViewModel.stateflowOrderCancelled.collectAsState()
+    val stateFlowError by ExceptionHandler.stateFlowError.collectAsState()
+
+    val listChange by coinsViewModel.stateFlowListChange.collectAsState()
+
+    CoinsScreen(
+        selectedProduct = selectedProduct,
+        coinsStorage = coinsStorage,
+        insertedAmount = insertedAmount,
+        priceMet = priceMet,
+        changeCalculated = changeCalculated,
+        orderCancelled = orderCancelled,
+        stateFlowError = stateFlowError,
+        listChange = listChange,
+
+        onOrderCancelledCLick = {
+            coinsViewModel.cancelOrder()
+        },
+        onAddAllUserCoins = {
+            coinsViewModel.addUserCoins()
+        },
+        onAddUserCoin = {
+            coinsViewModel.addUserCoin(it)
+        },
+        onAlertOkClick = onAlertOkClick
+    )
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,24 +114,27 @@ fun CoinsTopBar(onIconClick: () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoinsScreen(
-    navHostController: NavHostController,
-    coinsViewModel: CoinsViewModel = hiltViewModel()) {
+    selectedProduct: Product?,
+    coinsStorage: List<Coin>,
+    insertedAmount: String,
+    priceMet: Boolean,
+    changeCalculated: Boolean,
+    orderCancelled: Boolean,
+    stateFlowError: OneTimeEvent<Throwable>,
+    listChange: List<Coin>,
+
+    onOrderCancelledCLick: () -> Unit,
+    onAddAllUserCoins: () -> Unit,
+    onAddUserCoin: (Coin) -> Unit,
+    onAlertOkClick: () -> Unit
+) {
 
     var coinsAlpha by rememberSaveable { mutableFloatStateOf(1f) }
+
     val showDialog = remember { mutableStateOf(true) }
     val showErrorDialog = remember { mutableStateOf(false) }
 
-    val selectedProduct = coinsViewModel.stateFlowSelectedProduct.collectAsState()
-    val coinsStorage = coinsViewModel.stateFlowCoinsStorage.collectAsState(initial = emptyList())
-
-    val insertedAmount = coinsViewModel.stateFlowInsertedAmount.collectAsState()
-
-    val priceMet by coinsViewModel.stateFlowPriceMet.collectAsState()
-    val changeCalculated = coinsViewModel.stateFlowChangeCalculated.collectAsState()
-    val orderCancelled = coinsViewModel.stateflowOrderCancelled.collectAsState()
-    val stateFlowError = ExceptionHandler.stateFlowError.collectAsState()
-
-    stateFlowError.value.getContentIfNotHandled()?.let {
+    stateFlowError.getContentIfNotHandled()?.let {
         showErrorDialog.value = true
     }
 
@@ -109,33 +146,34 @@ fun CoinsScreen(
 
     if (priceMet && !showErrorDialog.value) {
         coinsAlpha = 0.5f
-        if (!changeCalculated.value) coinsViewModel.addUserCoins()
+        if (!changeCalculated)
+            onAddAllUserCoins()
         else if (showDialog.value) {
-            ShowGetProductAlert(coinsViewModel.mutableListCoinsForReturn) {
+            ShowGetProductAlert(listChange) {
                 showDialog.value = false
                 SoundManager.getInstance().playClick()
-                navHostController.popBackStack()
+                onAlertOkClick()
             }
         }
     }
 
-    if (orderCancelled.value)
+    if (orderCancelled)
         if (showDialog.value) {
-            ShowOrderCancelledAlert(coinsViewModel.mutableListCoinsForReturn) {
+            ShowOrderCancelledAlert(listChange) {
                 showDialog.value = false
                 SoundManager.getInstance().playClick()
-                navHostController.popBackStack()
+                onAlertOkClick()
             }
         }
 
     BackHandler(enabled = true) {
-        coinsViewModel.cancelOrder()
+        onOrderCancelledCLick()
     }
 
     Scaffold(
         topBar = {
             CoinsTopBar {
-                coinsViewModel.cancelOrder()
+                onOrderCancelledCLick()
             }
         }
     ) { paddingValues ->
@@ -165,13 +203,13 @@ fun CoinsScreen(
                 item(
                     span = { GridItemSpan(2) }
                 ) {
-                    ProductInfoBox(selectedProduct.value, insertedAmount.value)
+                    ProductInfoBox(selectedProduct, insertedAmount)
                 }
-                items(coinsStorage.value.size) {
-                    CoinsCard(coinsStorage.value[it]) {
+                items(coinsStorage.size) {
+                    CoinsCard(coinsStorage[it]) {
                         if (!priceMet) {
                             SoundManager.getInstance().playCoin()
-                            coinsViewModel.addUserCoin(coinsStorage.value[it])
+                            onAddUserCoin(coinsStorage[it])
                         }
                     }
                 }
@@ -310,15 +348,30 @@ fun CoinsCard(
     }
 }
 
-@SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true)
 @Composable
-fun PreviewCoinsScreen() {
+fun CoinsScreenPreview() {
+    val product = Product(1, "Coke", 2.5, 10)
+    val coins = listOf(
+        Coin(1, "Toonie", 2.0, 10),
+        Coin(2, "Loonie", 1.0, 10),
+        Coin(3, "Quarter", 0.25, 10)
+    )
+    val errorEvent = OneTimeEvent(RuntimeException())
+    errorEvent.hasBeenHandled = true
+
     CoinsScreen(
-        rememberNavController(),
-        coinsViewModel = CoinsViewModel(
-            DataRepo(FakeRemoteDataSourceImpl(), FakeDataStoreOperations()),
-            savedStateHandle = SavedStateHandle(mapOf(ARG_PRODUCT_ID to 1))
-        )
+        selectedProduct = product,
+        coinsStorage = coins,
+        insertedAmount = "1.00",
+        priceMet = false,
+        changeCalculated = false,
+        orderCancelled = false,
+        stateFlowError = errorEvent,
+        listChange = emptyList(),
+        onOrderCancelledCLick = {},
+        onAddAllUserCoins = {},
+        onAddUserCoin = {},
+        onAlertOkClick = {}
     )
 }

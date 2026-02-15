@@ -31,8 +31,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.fosents.kotlinvendingmachine.R
 import com.fosents.kotlinvendingmachine.data.DataRepo
-import com.fosents.kotlinvendingmachine.data.FakeRemoteDataSourceImpl
-import com.fosents.kotlinvendingmachine.data.local.FakeDataStoreOperations
 import com.fosents.kotlinvendingmachine.data.remote.utils.ExceptionHandler
 import com.fosents.kotlinvendingmachine.sound.SoundManager
 import com.fosents.kotlinvendingmachine.ui.alert.NoConnectionAlert
@@ -157,14 +155,14 @@ fun MaintenanceCard(
     }
 }
 
-@SuppressLint("ViewModelConstructorInComposable")
-@Preview(showBackground = true)
-@Composable
-fun PreviewMaintenanceScreen() {
-    MaintenanceScreen(
-        rememberNavController(),
-        maintenanceViewModel = MaintenanceViewModel(
-            DataRepo(FakeRemoteDataSourceImpl(), FakeDataStoreOperations())
-        )
-    )
-}
+//@SuppressLint("ViewModelConstructorInComposable")
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewMaintenanceScreen() {
+//    MaintenanceScreen(
+//        rememberNavController(),
+//        maintenanceViewModel = MaintenanceViewModel(
+//            DataRepo(FakeRemoteDataSourceImpl(), FakeDataStoreOperations())
+//        )
+//    )
+//}

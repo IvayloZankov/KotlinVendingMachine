@@ -9,7 +9,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.fosents.kotlinvendingmachine.ui.screen.CoinsScreen
+import com.fosents.kotlinvendingmachine.ui.screen.CoinsFragment
 import com.fosents.kotlinvendingmachine.ui.screen.MaintenanceScreen
 import com.fosents.kotlinvendingmachine.ui.screen.ProductsScreen
 import com.fosents.kotlinvendingmachine.util.Constants.ARG_PRODUCT_ID
@@ -72,7 +72,11 @@ fun SetupNavGraph(navController: NavHostController) {
                         fadeOut(animationSpec = tween(300))
             }
         ) {
-            CoinsScreen(navHostController = navController)
+            CoinsFragment(
+                onAlertOkClick = {
+                    navController.popBackStack()
+                }
+            )
         }
         composable(
             route = Screen.Maintenance.route,

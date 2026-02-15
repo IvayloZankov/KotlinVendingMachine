@@ -32,8 +32,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.fosents.kotlinvendingmachine.R
 import com.fosents.kotlinvendingmachine.data.DataRepo
-import com.fosents.kotlinvendingmachine.data.FakeRemoteDataSourceImpl
-import com.fosents.kotlinvendingmachine.data.local.FakeDataStoreOperations
 import com.fosents.kotlinvendingmachine.data.remote.utils.ExceptionHandler.stateFlowError
 import com.fosents.kotlinvendingmachine.model.Product
 import com.fosents.kotlinvendingmachine.navigation.Screen
@@ -213,14 +211,14 @@ fun ProductCard(
     }
 }
 
-@SuppressLint("ViewModelConstructorInComposable")
-@Preview(showBackground = true)
-@Composable
-fun PreviewProductsScreen() {
-    ProductsScreen(
-        rememberNavController(),
-        productsViewModel = ProductsViewModel(
-            DataRepo(FakeRemoteDataSourceImpl(), FakeDataStoreOperations())
-        )
-    )
-}
+//@SuppressLint("ViewModelConstructorInComposable")
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewProductsScreen() {
+//    ProductsScreen(
+//        rememberNavController(),
+//        productsViewModel = ProductsViewModel(
+//            DataRepo(FakeRemoteDataSourceImpl(), FakeDataStoreOperations())
+//        )
+//    )
+//}

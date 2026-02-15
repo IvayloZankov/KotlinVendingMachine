@@ -3,19 +3,16 @@ package com.fosents.kotlinvendingmachine.calc
 import com.fosents.kotlinvendingmachine.model.Coin
 import java.math.BigDecimal
 
-fun insertCoin(coin: Coin, list: MutableList<Coin>) {
-    var found = false
+fun insertCoin(coin: Coin, list: List<Coin>): List<Coin> {
+
     for (index in 0 until list.size) {
         if (coin.id == list[index].id) {
             list[index].quantity = list[index].quantity.plus(1)
-            found = true
-            break
+            return list
         }
     }
-    if (!found) {
-        coin.quantity = 1
-        list.add(coin)
-    }
+    coin.quantity = 1
+    return list.plus(coin)
 }
 
 fun insertUserCoins(listUser: List<Coin>, listStorage: List<Coin>) {
@@ -35,7 +32,7 @@ fun getCoinsForReturn(
     coinsStorage: List<Coin>
 ): List<Coin> {
     var change = BigDecimal(insertedAmount).subtract(BigDecimal(productPrice.toString()))
-    val listCoins = mutableListOf<Coin>()
+    var listForReturn = listOf<Coin>()
 
     while (change.toDouble() > 0.00) {
         for (i in coinsStorage.size - 1 downTo 0) {
@@ -45,10 +42,10 @@ fun getCoinsForReturn(
                 coin.quantity = coin.quantity.minus(1)
                 change = change.subtract(BigDecimal(coin.price.toString()))
                 val coinChange = coin.copy(quantity = 1)
-                insertCoin(coinChange, listCoins)
+                listForReturn = insertCoin(coinChange, listForReturn)
                 break
             }
         }
     }
-    return listCoins
+    return listForReturn
 }
