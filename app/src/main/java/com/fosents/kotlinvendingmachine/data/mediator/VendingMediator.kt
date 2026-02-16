@@ -6,8 +6,8 @@ import com.fosents.kotlinvendingmachine.data.local.entity.toEntity
 import com.fosents.kotlinvendingmachine.data.remote.VendingApi
 import com.fosents.kotlinvendingmachine.data.remote.dto.toDto
 import com.fosents.kotlinvendingmachine.data.remote.dto.toEntity
-import com.fosents.kotlinvendingmachine.model.Coin
-import com.fosents.kotlinvendingmachine.model.Product
+import com.fosents.kotlinvendingmachine.domain.model.Coin
+import com.fosents.kotlinvendingmachine.domain.model.Product
 import javax.inject.Inject
 
 class VendingMediator @Inject constructor(

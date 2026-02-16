@@ -1,7 +1,7 @@
 package com.fosents.kotlinvendingmachine.data.remote.dto
 
 import com.fosents.kotlinvendingmachine.data.local.entity.CoinEntity
-import com.fosents.kotlinvendingmachine.model.Coin
+import com.fosents.kotlinvendingmachine.domain.model.Coin
 import kotlinx.serialization.Serializable
 
 @Serializable

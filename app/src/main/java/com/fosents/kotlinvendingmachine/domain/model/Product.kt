@@ -1,6 +1,6 @@
-package com.fosents.kotlinvendingmachine.model
+package com.fosents.kotlinvendingmachine.domain.model
 
-data class Coin(
+data class Product(
     val id: Int,
     var name: String,
     var price: Double,

@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fosents.kotlinvendingmachine.data.DataRepo
 import com.fosents.kotlinvendingmachine.data.remote.utils.request
-import com.fosents.kotlinvendingmachine.model.Coin
-import com.fosents.kotlinvendingmachine.model.Product
+import com.fosents.kotlinvendingmachine.domain.model.Coin
+import com.fosents.kotlinvendingmachine.domain.model.Product
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

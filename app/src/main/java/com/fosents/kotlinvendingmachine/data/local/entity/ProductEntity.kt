@@ -2,7 +2,7 @@ package com.fosents.kotlinvendingmachine.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.fosents.kotlinvendingmachine.model.Product
+import com.fosents.kotlinvendingmachine.domain.model.Product
 import kotlinx.serialization.Serializable
 
 private const val PRODUCT_DATABASE_TABLE = "product_table"

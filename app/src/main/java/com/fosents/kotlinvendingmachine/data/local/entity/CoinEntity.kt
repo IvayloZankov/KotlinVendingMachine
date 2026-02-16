@@ -2,7 +2,7 @@ package com.fosents.kotlinvendingmachine.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.fosents.kotlinvendingmachine.model.Coin
+import com.fosents.kotlinvendingmachine.domain.model.Coin
 import kotlinx.serialization.Serializable
 
 private const val COIN_DATABASE_TABLE = "coin_table"

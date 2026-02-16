@@ -1,4 +1,4 @@
-package com.fosents.kotlinvendingmachine.navigation
+package com.fosents.kotlinvendingmachine.ui.navigation
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.FastOutSlowInEasing

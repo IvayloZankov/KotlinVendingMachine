@@ -4,8 +4,8 @@ import com.fosents.kotlinvendingmachine.data.local.VendingDatabase
 import com.fosents.kotlinvendingmachine.data.local.entity.toDomain
 import com.fosents.kotlinvendingmachine.data.mediator.VendingMediator
 import com.fosents.kotlinvendingmachine.data.remote.VendingApi
-import com.fosents.kotlinvendingmachine.model.Coin
-import com.fosents.kotlinvendingmachine.model.Product
+import com.fosents.kotlinvendingmachine.domain.model.Coin
+import com.fosents.kotlinvendingmachine.domain.model.Product
 import kotlin.collections.map
 
 class RemoteDataSourceImpl(

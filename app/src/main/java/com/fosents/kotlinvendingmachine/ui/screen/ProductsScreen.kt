@@ -30,7 +30,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.fosents.kotlinvendingmachine.R
 import com.fosents.kotlinvendingmachine.data.remote.utils.ExceptionHandler.stateFlowError
 import com.fosents.kotlinvendingmachine.data.remote.utils.OneTimeEvent
-import com.fosents.kotlinvendingmachine.model.Product
+import com.fosents.kotlinvendingmachine.domain.model.Product
 import com.fosents.kotlinvendingmachine.sound.SoundManager
 import com.fosents.kotlinvendingmachine.ui.alert.NoConnectionAlert
 import com.fosents.kotlinvendingmachine.ui.alert.ShowOutOfOrderAlert

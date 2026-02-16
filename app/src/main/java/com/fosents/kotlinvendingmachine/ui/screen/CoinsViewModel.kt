@@ -3,13 +3,13 @@ package com.fosents.kotlinvendingmachine.ui.screen
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.fosents.kotlinvendingmachine.calc.getCoinsForReturn
-import com.fosents.kotlinvendingmachine.calc.insertCoin
-import com.fosents.kotlinvendingmachine.calc.insertUserCoins
 import com.fosents.kotlinvendingmachine.data.DataRepo
 import com.fosents.kotlinvendingmachine.data.remote.utils.request
-import com.fosents.kotlinvendingmachine.model.Coin
-import com.fosents.kotlinvendingmachine.model.Product
+import com.fosents.kotlinvendingmachine.domain.model.Coin
+import com.fosents.kotlinvendingmachine.domain.model.Product
+import com.fosents.kotlinvendingmachine.domain.model.insertCoin
+import com.fosents.kotlinvendingmachine.domain.usecase.CalculateChangeUseCase
+import com.fosents.kotlinvendingmachine.domain.usecase.InsertUserCoinsUseCase
 import com.fosents.kotlinvendingmachine.util.Constants.ARG_PRODUCT_ID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -19,6 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class CoinsViewModel @Inject constructor(
     private val dataRepo: DataRepo,
+    private val calculateChangeUseCase: CalculateChangeUseCase,
+    private val insertUserCoinsUseCase: InsertUserCoinsUseCase,
     savedStateHandle: SavedStateHandle
 ): ViewModel() {
 
@@ -61,8 +63,8 @@ class CoinsViewModel @Inject constructor(
             BigDecimal(it).add(BigDecimal.valueOf(coin.price)).toString()
         }
         val coinUser = coin.copy(quantity = 1)
-        _stateFlowListCoinsUser.update {
-            insertCoin(coinUser, it)
+        _stateFlowListCoinsUser.update { list ->
+            list.insertCoin(coinUser)
         }
 
         if (stateFlowInsertedAmount.value.toDouble() >= stateFlowSelectedProduct.value!!.price)
@@ -76,13 +78,13 @@ class CoinsViewModel @Inject constructor(
                 dataRepo.updateProduct(product)
             }
 
-            insertUserCoins(_stateFlowListCoinsUser.value, _stateFlowCoinsStorage.value)
+            insertUserCoinsUseCase(_stateFlowListCoinsUser.value, _stateFlowCoinsStorage.value)
             _stateFlowListCoinsUser.update {
                 emptyList()
             }
             _stateFlowSelectedProduct.value?.let { product ->
                 _stateFlowListChange.update {
-                    getCoinsForReturn(
+                    calculateChangeUseCase(
                         stateFlowInsertedAmount.value,
                         product.price,
                         _stateFlowCoinsStorage.value

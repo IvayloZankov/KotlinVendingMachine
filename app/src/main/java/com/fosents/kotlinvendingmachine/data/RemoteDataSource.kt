@@ -1,7 +1,7 @@
 package com.fosents.kotlinvendingmachine.data
 
-import com.fosents.kotlinvendingmachine.model.Coin
-import com.fosents.kotlinvendingmachine.model.Product
+import com.fosents.kotlinvendingmachine.domain.model.Coin
+import com.fosents.kotlinvendingmachine.domain.model.Product
 
 interface RemoteDataSource {
     suspend fun fetchRemoteData()
