@@ -1,8 +1,5 @@
 package com.fosents.kotlinvendingmachine.di
 
-import com.fosents.kotlinvendingmachine.data.RemoteDataSource
-import com.fosents.kotlinvendingmachine.data.RemoteDataSourceImpl
-import com.fosents.kotlinvendingmachine.data.local.VendingDatabase
 import com.fosents.kotlinvendingmachine.data.remote.VendingApi
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
@@ -40,14 +37,5 @@ object NetworkModule {
     @Singleton
     fun provideVendingApi(retrofit: Retrofit): VendingApi {
         return retrofit.create(VendingApi::class.java)
-    }
-
-    @Provides
-    @Singleton
-    fun provideRemoteDataSource(
-        vendingApi: VendingApi,
-        vendingDatabase: VendingDatabase
-    ): RemoteDataSource {
-        return RemoteDataSourceImpl(vendingApi, vendingDatabase)
     }
 }

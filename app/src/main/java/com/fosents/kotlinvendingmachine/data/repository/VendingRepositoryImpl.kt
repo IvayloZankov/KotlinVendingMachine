@@ -1,23 +1,37 @@
-package com.fosents.kotlinvendingmachine.data.mediator
+package com.fosents.kotlinvendingmachine.data.repository
 
 import androidx.room.withTransaction
 import com.fosents.kotlinvendingmachine.data.local.VendingDatabase
+import com.fosents.kotlinvendingmachine.data.local.entity.toDomain
 import com.fosents.kotlinvendingmachine.data.local.entity.toEntity
 import com.fosents.kotlinvendingmachine.data.remote.VendingApi
 import com.fosents.kotlinvendingmachine.data.remote.dto.toDto
 import com.fosents.kotlinvendingmachine.data.remote.dto.toEntity
 import com.fosents.kotlinvendingmachine.domain.model.Coin
 import com.fosents.kotlinvendingmachine.domain.model.Product
+import com.fosents.kotlinvendingmachine.domain.repository.VendingRepository
 import javax.inject.Inject
 
-class VendingMediator @Inject constructor(
+class VendingRepositoryImpl @Inject constructor(
     private val api: VendingApi,
     private val database: VendingDatabase
-){
+): VendingRepository {
     private val productsDao = database.productDao()
     private val coinsDao = database.coinDao()
 
-    suspend fun fetchRemoteData() {
+    override suspend fun getProducts(): List<Product> {
+        return productsDao.getProducts().map { it.toDomain() }
+    }
+
+    override suspend fun getSelectedProduct(productId: Int): Product {
+        return productsDao.getSelectedProduct(productId).toDomain()
+    }
+
+    override suspend fun getCoins(): List<Coin> {
+        return coinsDao.getCoins().map { it.toDomain() }
+    }
+
+    override suspend fun fetchRemoteData() {
         val responseProducts = api.getProducts()
         if (responseProducts.data.isNotEmpty()) {
             database.withTransaction {
@@ -34,7 +48,7 @@ class VendingMediator @Inject constructor(
         }
     }
 
-    suspend fun updateCoins(list: List<Coin>) {
+    override suspend fun updateCoins(list: List<Coin>) {
         api.updateCoins(list.map { it.toDto() })
         database.withTransaction {
             coinsDao.deleteAllCoins()
@@ -42,12 +56,12 @@ class VendingMediator @Inject constructor(
         }
     }
 
-    suspend fun updateProduct(product: Product) {
+    override suspend fun updateProduct(product: Product) {
         api.decreaseProduct(mapOf("id" to product.id))
         productsDao.updateProduct(product.toEntity())
     }
 
-    suspend fun resetProducts() {
+    override suspend fun resetProducts() {
         val response = api.resetProducts()
         if (response.data.isNotEmpty()) {
             database.withTransaction {
@@ -57,7 +71,7 @@ class VendingMediator @Inject constructor(
         }
     }
 
-    suspend fun resetCoins() {
+    override suspend fun resetCoins() {
         val response = api.resetCoins()
         if (response.data.isNotEmpty()) {
             database.withTransaction {

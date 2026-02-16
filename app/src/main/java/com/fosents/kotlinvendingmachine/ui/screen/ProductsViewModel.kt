@@ -2,10 +2,11 @@ package com.fosents.kotlinvendingmachine.ui.screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.fosents.kotlinvendingmachine.data.DataRepo
+import com.fosents.kotlinvendingmachine.domain.repository.SettingsRepository
 import com.fosents.kotlinvendingmachine.data.remote.utils.request
 import com.fosents.kotlinvendingmachine.domain.model.Coin
 import com.fosents.kotlinvendingmachine.domain.model.Product
+import com.fosents.kotlinvendingmachine.domain.repository.VendingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +17,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProductsViewModel @Inject constructor(
-    private val dataRepo: DataRepo
+    private val vendingRepository: VendingRepository,
+    private val settingsRepository: SettingsRepository
 ): ViewModel() {
 
     private val _vendingId = MutableStateFlow("")
@@ -36,9 +38,9 @@ class ProductsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(Dispatchers.Default) {
-            _vendingId.value = dataRepo.readVendingId().stateIn(viewModelScope).value
+            _vendingId.value = settingsRepository.readVendingId().stateIn(viewModelScope).value
             if (vendingId.value == "") {
-                dataRepo.generateVendingId()
+                settingsRepository.generateVendingId()
             }
         }
         fetchRemoteData()
@@ -47,14 +49,14 @@ class ProductsViewModel @Inject constructor(
     fun fetchRemoteData() {
         _isLoading.value = true
         viewModelScope.request {
-            dataRepo.fetchRemoteData()
+            vendingRepository.fetchRemoteData()
             _isLoading.value = false
         }
     }
 
     fun fetchCoins() {
         viewModelScope.launch(Dispatchers.IO) {
-            _coinsStorage.value = dataRepo.getCoins()
+            _coinsStorage.value = vendingRepository.getCoins()
             if (_coinsStorage.value.isNotEmpty())
                 _outOfOrder.value = _coinsStorage.value[0].quantity < 40
         }
@@ -62,7 +64,7 @@ class ProductsViewModel @Inject constructor(
 
     fun fetchProducts() {
         viewModelScope.launch(Dispatchers.IO) {
-            _stateFlowProducts.value = dataRepo.getProducts().filter { it.quantity > 0 }
+            _stateFlowProducts.value = vendingRepository.getProducts().filter { it.quantity > 0 }
         }
     }
 }

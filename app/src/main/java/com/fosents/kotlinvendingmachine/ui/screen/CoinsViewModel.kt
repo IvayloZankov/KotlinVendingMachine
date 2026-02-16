@@ -3,11 +3,11 @@ package com.fosents.kotlinvendingmachine.ui.screen
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.fosents.kotlinvendingmachine.data.DataRepo
 import com.fosents.kotlinvendingmachine.data.remote.utils.request
 import com.fosents.kotlinvendingmachine.domain.model.Coin
 import com.fosents.kotlinvendingmachine.domain.model.Product
 import com.fosents.kotlinvendingmachine.domain.model.insertCoin
+import com.fosents.kotlinvendingmachine.domain.repository.VendingRepository
 import com.fosents.kotlinvendingmachine.domain.usecase.CalculateChangeUseCase
 import com.fosents.kotlinvendingmachine.domain.usecase.InsertUserCoinsUseCase
 import com.fosents.kotlinvendingmachine.util.Constants.ARG_PRODUCT_ID
@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CoinsViewModel @Inject constructor(
-    private val dataRepo: DataRepo,
+    private val vendingRepository: VendingRepository,
     private val calculateChangeUseCase: CalculateChangeUseCase,
     private val insertUserCoinsUseCase: InsertUserCoinsUseCase,
     savedStateHandle: SavedStateHandle
@@ -52,9 +52,9 @@ class CoinsViewModel @Inject constructor(
         viewModelScope.request {
             val productId = savedStateHandle.get<Int>(ARG_PRODUCT_ID)
             _stateFlowSelectedProduct.value = productId?.let {
-                dataRepo.getSelectedProduct(it)
+                vendingRepository.getSelectedProduct(it)
             }
-            _stateFlowCoinsStorage.value = dataRepo.getCoins()
+            _stateFlowCoinsStorage.value = vendingRepository.getCoins()
         }
     }
 
@@ -75,7 +75,7 @@ class CoinsViewModel @Inject constructor(
         viewModelScope.request {
             _stateFlowSelectedProduct.value?.let {
                 val product = it.copy(quantity = it.quantity.minus(1))
-                dataRepo.updateProduct(product)
+                vendingRepository.updateProduct(product)
             }
 
             insertUserCoinsUseCase(_stateFlowListCoinsUser.value, _stateFlowCoinsStorage.value)
@@ -92,7 +92,7 @@ class CoinsViewModel @Inject constructor(
                 }
                 _stateFlowChangeCalculated.value = true
             }
-            dataRepo.updateCoins(_stateFlowCoinsStorage.value)
+            vendingRepository.updateCoins(_stateFlowCoinsStorage.value)
         }
     }
 
