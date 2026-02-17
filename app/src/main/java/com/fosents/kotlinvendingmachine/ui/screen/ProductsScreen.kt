@@ -31,7 +31,6 @@ import com.fosents.kotlinvendingmachine.R
 import com.fosents.kotlinvendingmachine.data.remote.utils.ExceptionHandler.stateFlowError
 import com.fosents.kotlinvendingmachine.data.remote.utils.OneTimeEvent
 import com.fosents.kotlinvendingmachine.domain.model.Product
-import com.fosents.kotlinvendingmachine.sound.SoundManager
 import com.fosents.kotlinvendingmachine.ui.alert.NoConnectionAlert
 import com.fosents.kotlinvendingmachine.ui.alert.ShowOutOfOrderAlert
 import com.fosents.kotlinvendingmachine.ui.theme.Gold
@@ -42,17 +41,17 @@ import java.util.*
 
 @Composable
 fun ProductsFragment(
-    productsViewModel: ProductsViewModel = hiltViewModel(),
+    viewModel: ProductsViewModel = hiltViewModel(),
     onGoMaintenanceClick: () -> Unit = {},
     onProductClick: (Int) -> Unit = {}
 ) {
-    val products by productsViewModel.stateFlowProducts.collectAsState(initial = emptyList())
-    val outOfOrder by productsViewModel.outOfOrder.collectAsState()
+    val products by viewModel.stateFlowProducts.collectAsState(initial = emptyList())
+    val outOfOrder by viewModel.outOfOrder.collectAsState()
     val stateFlowError by stateFlowError.collectAsState()
-    val isLoading by productsViewModel.isLoading.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
 
-    productsViewModel.fetchProducts()
-    productsViewModel.fetchCoins()
+    viewModel.fetchProducts()
+    viewModel.fetchCoins()
 
     ProductsScreen(
         products = products,
@@ -60,10 +59,16 @@ fun ProductsFragment(
         stateFlowError = stateFlowError,
         isLoading = isLoading,
         onRetryClick = {
-            productsViewModel.fetchRemoteData()
+            viewModel.fetchRemoteData()
         },
-        onGoMaintenanceClick = onGoMaintenanceClick,
-        onProductClick = onProductClick
+        onGoMaintenanceClick = {
+            viewModel.playClickSound()
+            onGoMaintenanceClick()
+        },
+        onProductClick = {
+            viewModel.playClickSound()
+            onProductClick(it)
+        }
     )
 }
 
@@ -102,7 +107,7 @@ fun ProductsScreen(
     isLoading: Boolean,
     onRetryClick: () -> Unit = {},
     onGoMaintenanceClick: () -> Unit = {},
-    onProductClick: (Int) -> Unit = {},
+    onProductClick: (Int) -> Unit = {}
 ) {
     val showDialog = remember { mutableStateOf(true) }
     val showErrorDialog = remember { mutableStateOf(false) }
@@ -130,7 +135,6 @@ fun ProductsScreen(
     Scaffold(
         topBar = {
             ProductsTopBar {
-                SoundManager.getInstance().playClick()
                 onGoMaintenanceClick()
             }
         }
@@ -185,7 +189,6 @@ fun ProductsGrid(
     ) {
         items(products.size) {
             ProductCard(products[it]) {
-                SoundManager.getInstance().playClick()
                 onProductClick(products[it].id)
             }
         }

@@ -25,7 +25,6 @@ import com.fosents.kotlinvendingmachine.ui.theme.Typography
 
 @Composable
 fun ShowOrderCancelledAlert(listCoins: List<Coin>, onClick: () -> Unit) {
-    SoundManager.getInstance().playError()
     AnimatedAlert {
         ContentOrderCancelled(it, listCoins, onClick)
     }

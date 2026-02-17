@@ -39,7 +39,6 @@ import com.fosents.kotlinvendingmachine.data.remote.utils.ExceptionHandler
 import com.fosents.kotlinvendingmachine.data.remote.utils.OneTimeEvent
 import com.fosents.kotlinvendingmachine.domain.model.Coin
 import com.fosents.kotlinvendingmachine.domain.model.Product
-import com.fosents.kotlinvendingmachine.sound.SoundManager
 import com.fosents.kotlinvendingmachine.ui.alert.NoConnectionAlert
 import com.fosents.kotlinvendingmachine.ui.alert.ShowGetProductAlert
 import com.fosents.kotlinvendingmachine.ui.alert.ShowOrderCancelledAlert
@@ -83,7 +82,10 @@ fun CoinsFragment(
         onAddUserCoin = {
             coinsViewModel.addUserCoin(it)
         },
-        onAlertOkClick = onAlertOkClick
+        onAlertOkClick = {
+            coinsViewModel.playClickSound()
+            onAlertOkClick()
+        }
     )
 }
 
@@ -151,7 +153,6 @@ fun CoinsScreen(
         else if (showDialog.value) {
             ShowGetProductAlert(listChange) {
                 showDialog.value = false
-                SoundManager.getInstance().playClick()
                 onAlertOkClick()
             }
         }
@@ -161,7 +162,6 @@ fun CoinsScreen(
         if (showDialog.value) {
             ShowOrderCancelledAlert(listChange) {
                 showDialog.value = false
-                SoundManager.getInstance().playClick()
                 onAlertOkClick()
             }
         }
@@ -208,7 +208,6 @@ fun CoinsScreen(
                 items(coinsStorage.size) {
                     CoinsCard(coinsStorage[it]) {
                         if (!priceMet) {
-                            SoundManager.getInstance().playCoin()
                             onAddUserCoin(coinsStorage[it])
                         }
                     }

@@ -41,6 +41,5 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-        SoundManager.getInstance().loadSounds(this)
     }
 }

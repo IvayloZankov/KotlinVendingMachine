@@ -8,6 +8,7 @@ import com.fosents.kotlinvendingmachine.domain.usecase.CheckOutOfOrderUseCase
 import com.fosents.kotlinvendingmachine.domain.usecase.GetAvailableProductsUseCase
 import com.fosents.kotlinvendingmachine.domain.usecase.ManageVendingIdUseCase
 import com.fosents.kotlinvendingmachine.domain.usecase.SyncRemoteDataUseCase
+import com.fosents.kotlinvendingmachine.sound.SoundManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,7 +21,8 @@ class ProductsViewModel @Inject constructor(
     private val getAvailableProductsUseCase: GetAvailableProductsUseCase,
     private val checkOutOfOrderUseCase: CheckOutOfOrderUseCase,
     private val syncRemoteDataUseCase: SyncRemoteDataUseCase,
-    private val manageVendingIdUseCase: ManageVendingIdUseCase
+    private val manageVendingIdUseCase: ManageVendingIdUseCase,
+    private val soundManager: SoundManager
 ): ViewModel() {
 
     private val _stateFlowProducts = MutableStateFlow<List<Product>>(emptyList())
@@ -48,8 +50,12 @@ class ProductsViewModel @Inject constructor(
 
     fun fetchCoins() {
         viewModelScope.launch {
+            val outOfOrder = checkOutOfOrderUseCase()
+            if (outOfOrder) {
+                soundManager.play(SoundManager.SoundType.ERROR)
+            }
             _outOfOrder.update {
-                checkOutOfOrderUseCase()
+                outOfOrder
             }
         }
     }
@@ -60,5 +66,9 @@ class ProductsViewModel @Inject constructor(
                 getAvailableProductsUseCase()
             }
         }
+    }
+
+    fun playClickSound() {
+        soundManager.play(SoundManager.SoundType.CLICK)
     }
 }

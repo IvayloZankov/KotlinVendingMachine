@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.fosents.kotlinvendingmachine.R
 import com.fosents.kotlinvendingmachine.data.remote.utils.ExceptionHandler
-import com.fosents.kotlinvendingmachine.sound.SoundManager
 import com.fosents.kotlinvendingmachine.ui.alert.NoConnectionAlert
 import com.fosents.kotlinvendingmachine.ui.theme.BackgroundColor
 import com.fosents.kotlinvendingmachine.ui.theme.Gold
@@ -38,15 +37,18 @@ import com.fosents.kotlinvendingmachine.ui.theme.Typography
 
 @Composable
 fun MaintenanceFragment(
-    maintenanceViewModel: MaintenanceViewModel = hiltViewModel(),
+    viewModel: MaintenanceViewModel = hiltViewModel(),
     onBackClick: () -> Unit
 ) {
 
     MaintenanceScreen(
         onResetClick = {
-            maintenanceViewModel.initReset(it)
+            viewModel.initReset(it)
         },
-        onBackClick = onBackClick
+        onBackClick = {
+            viewModel.playClickSound()
+            onBackClick()
+        }
     )
 }
 
@@ -102,7 +104,6 @@ fun MaintenanceScreen(
     Scaffold(
         topBar = {
             MaintenanceTopBar {
-                SoundManager.getInstance().playClick()
                 onBackClick()
             }
         }
@@ -118,7 +119,6 @@ fun MaintenanceScreen(
             ) {
                 items(2) {
                     MaintenanceCard(options[it]) {
-                        SoundManager.getInstance().playClick()
                         onResetClick(options[it])
                     }
                 }

@@ -9,6 +9,7 @@ import com.fosents.kotlinvendingmachine.domain.model.Product
 import com.fosents.kotlinvendingmachine.domain.model.insertCoin
 import com.fosents.kotlinvendingmachine.domain.usecase.ExecutePurchaseOrderUseCase
 import com.fosents.kotlinvendingmachine.domain.usecase.GetVendingMachineDataUseCase
+import com.fosents.kotlinvendingmachine.sound.SoundManager
 import com.fosents.kotlinvendingmachine.util.Constants.ARG_PRODUCT_ID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -19,6 +20,7 @@ import javax.inject.Inject
 class CoinsViewModel @Inject constructor(
     private val getVendingMachineDataUseCase: GetVendingMachineDataUseCase,
     private val executePurchaseOrderUseCase: ExecutePurchaseOrderUseCase,
+    private val soundManager: SoundManager,
     savedStateHandle: SavedStateHandle
 ): ViewModel() {
 
@@ -63,6 +65,7 @@ class CoinsViewModel @Inject constructor(
     }
 
     fun addUserCoin(coin: Coin) {
+        soundManager.play(SoundManager.SoundType.COIN)
         _stateFlowInsertedAmount.update {
             BigDecimal(it).add(BigDecimal.valueOf(coin.price)).toString()
         }
@@ -106,5 +109,9 @@ class CoinsViewModel @Inject constructor(
             emptyList()
         }
         _stateFlowOrderCancelled.value = true
+    }
+
+    fun playClickSound() {
+        soundManager.play(SoundManager.SoundType.CLICK)
     }
 }

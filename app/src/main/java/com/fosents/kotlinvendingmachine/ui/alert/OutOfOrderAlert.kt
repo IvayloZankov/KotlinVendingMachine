@@ -25,7 +25,6 @@ import com.fosents.kotlinvendingmachine.ui.theme.Typography
 
 @Composable
 fun ShowOutOfOrderAlert(onClick: () -> Unit) {
-    SoundManager.getInstance().playError()
     AnimatedAlert {
         ContentOutOfOrder(it, onClick)
     }
