@@ -10,7 +10,7 @@ import com.fosents.kotlinvendingmachine.data.local.entity.ProductEntity
 interface ProductsDao {
 
     @Query("SELECT * FROM product_table ORDER BY id ASC")
-    fun getProducts(): List<ProductEntity>
+    suspend fun getProducts(): List<ProductEntity>
 
     @Query("SELECT * FROM product_table WHERE id=:productId")
     suspend fun getSelectedProduct(productId: Int): ProductEntity

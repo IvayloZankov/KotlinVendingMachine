@@ -7,9 +7,8 @@ import com.fosents.kotlinvendingmachine.data.remote.utils.request
 import com.fosents.kotlinvendingmachine.domain.model.Coin
 import com.fosents.kotlinvendingmachine.domain.model.Product
 import com.fosents.kotlinvendingmachine.domain.model.insertCoin
-import com.fosents.kotlinvendingmachine.domain.repository.VendingRepository
-import com.fosents.kotlinvendingmachine.domain.usecase.CalculateChangeUseCase
-import com.fosents.kotlinvendingmachine.domain.usecase.InsertUserCoinsUseCase
+import com.fosents.kotlinvendingmachine.domain.usecase.ExecutePurchaseOrderUseCase
+import com.fosents.kotlinvendingmachine.domain.usecase.GetVendingMachineDataUseCase
 import com.fosents.kotlinvendingmachine.util.Constants.ARG_PRODUCT_ID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -18,9 +17,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CoinsViewModel @Inject constructor(
-    private val vendingRepository: VendingRepository,
-    private val calculateChangeUseCase: CalculateChangeUseCase,
-    private val insertUserCoinsUseCase: InsertUserCoinsUseCase,
+    private val getVendingMachineDataUseCase: GetVendingMachineDataUseCase,
+    private val executePurchaseOrderUseCase: ExecutePurchaseOrderUseCase,
     savedStateHandle: SavedStateHandle
 ): ViewModel() {
 
@@ -48,13 +46,19 @@ class CoinsViewModel @Inject constructor(
     private val _stateFlowOrderCancelled = MutableStateFlow(false)
     val stateflowOrderCancelled = _stateFlowOrderCancelled.asStateFlow()
 
+    private val productId = savedStateHandle.get<Int>(ARG_PRODUCT_ID) ?: -1
+
     init {
         viewModelScope.request {
-            val productId = savedStateHandle.get<Int>(ARG_PRODUCT_ID)
-            _stateFlowSelectedProduct.value = productId?.let {
-                vendingRepository.getSelectedProduct(it)
+
+            val data = getVendingMachineDataUseCase(productId)
+
+            _stateFlowSelectedProduct.update {
+                data.selectedProduct
             }
-            _stateFlowCoinsStorage.value = vendingRepository.getCoins()
+            _stateFlowCoinsStorage.update {
+                data.coins
+            }
         }
     }
 
@@ -73,26 +77,24 @@ class CoinsViewModel @Inject constructor(
 
     fun addUserCoins() {
         viewModelScope.request {
-            _stateFlowSelectedProduct.value?.let {
-                val product = it.copy(quantity = it.quantity.minus(1))
-                vendingRepository.updateProduct(product)
-            }
+            val currentProduct = _stateFlowSelectedProduct.value ?: return@request
+            val currentStorage = _stateFlowCoinsStorage.value
+            val userCoins = _stateFlowListCoinsUser.value
+            val totalAmount = stateFlowInsertedAmount.value
 
-            insertUserCoinsUseCase(_stateFlowListCoinsUser.value, _stateFlowCoinsStorage.value)
-            _stateFlowListCoinsUser.update {
-                emptyList()
-            }
-            _stateFlowSelectedProduct.value?.let { product ->
-                _stateFlowListChange.update {
-                    calculateChangeUseCase(
-                        stateFlowInsertedAmount.value,
-                        product.price,
-                        _stateFlowCoinsStorage.value
-                    )
-                }
-                _stateFlowChangeCalculated.value = true
-            }
-            vendingRepository.updateCoins(_stateFlowCoinsStorage.value)
+            val result = executePurchaseOrderUseCase(
+                product = currentProduct,
+                currentStorageCoins = currentStorage,
+                userInsertedCoins = userCoins,
+                totalInsertedAmount = totalAmount
+            )
+
+            _stateFlowSelectedProduct.value = result.updatedProduct
+            _stateFlowCoinsStorage.value = result.updatedCoins
+            _stateFlowListChange.value = result.change
+
+            _stateFlowListCoinsUser.value = emptyList()
+            _stateFlowChangeCalculated.value = true
         }
     }
 

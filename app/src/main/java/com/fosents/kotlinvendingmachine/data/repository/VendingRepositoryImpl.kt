@@ -10,6 +10,8 @@ import com.fosents.kotlinvendingmachine.data.remote.dto.toEntity
 import com.fosents.kotlinvendingmachine.domain.model.Coin
 import com.fosents.kotlinvendingmachine.domain.model.Product
 import com.fosents.kotlinvendingmachine.domain.repository.VendingRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class VendingRepositoryImpl @Inject constructor(
@@ -20,15 +22,21 @@ class VendingRepositoryImpl @Inject constructor(
     private val coinsDao = database.coinDao()
 
     override suspend fun getProducts(): List<Product> {
-        return productsDao.getProducts().map { it.toDomain() }
+        return withContext(Dispatchers.IO) {
+            productsDao.getProducts().map { it.toDomain() }
+        }
     }
 
     override suspend fun getSelectedProduct(productId: Int): Product {
-        return productsDao.getSelectedProduct(productId).toDomain()
+        return withContext(Dispatchers.IO) {
+            productsDao.getSelectedProduct(productId).toDomain()
+        }
     }
 
     override suspend fun getCoins(): List<Coin> {
-        return coinsDao.getCoins().map { it.toDomain() }
+        return withContext(Dispatchers.IO) {
+            coinsDao.getCoins().map { it.toDomain() }
+        }
     }
 
     override suspend fun fetchRemoteData() {
@@ -58,7 +66,9 @@ class VendingRepositoryImpl @Inject constructor(
 
     override suspend fun updateProduct(product: Product) {
         api.decreaseProduct(mapOf("id" to product.id))
-        productsDao.updateProduct(product.toEntity())
+        database.withTransaction {
+            productsDao.updateProduct(product.toEntity())
+        }
     }
 
     override suspend fun resetProducts() {
