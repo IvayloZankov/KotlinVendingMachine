@@ -1,4 +1,4 @@
-package com.fosents.kotlinvendingmachine.navigation
+package com.fosents.kotlinvendingmachine.ui.navigation
 
 sealed class Screen(val route: String) {
     data object Products: Screen("products_screen")

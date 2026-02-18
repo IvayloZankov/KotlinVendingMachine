@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.fosents.kotlinvendingmachine.model.Coin
+import com.fosents.kotlinvendingmachine.domain.model.Coin
 import com.fosents.kotlinvendingmachine.ui.theme.Gold
 import com.fosents.kotlinvendingmachine.ui.theme.Typography
 import java.util.*

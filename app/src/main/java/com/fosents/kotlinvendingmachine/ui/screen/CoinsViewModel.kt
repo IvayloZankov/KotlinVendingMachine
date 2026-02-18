@@ -3,13 +3,13 @@ package com.fosents.kotlinvendingmachine.ui.screen
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.fosents.kotlinvendingmachine.calc.getCoinsForReturn
-import com.fosents.kotlinvendingmachine.calc.insertCoin
-import com.fosents.kotlinvendingmachine.calc.insertUserCoins
-import com.fosents.kotlinvendingmachine.data.DataRepo
 import com.fosents.kotlinvendingmachine.data.remote.utils.request
-import com.fosents.kotlinvendingmachine.model.Coin
-import com.fosents.kotlinvendingmachine.model.Product
+import com.fosents.kotlinvendingmachine.domain.model.Coin
+import com.fosents.kotlinvendingmachine.domain.model.Product
+import com.fosents.kotlinvendingmachine.domain.model.insertCoin
+import com.fosents.kotlinvendingmachine.domain.usecase.ExecutePurchaseOrderUseCase
+import com.fosents.kotlinvendingmachine.domain.usecase.GetVendingMachineDataUseCase
+import com.fosents.kotlinvendingmachine.sound.SoundManager
 import com.fosents.kotlinvendingmachine.util.Constants.ARG_PRODUCT_ID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -18,7 +18,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CoinsViewModel @Inject constructor(
-    private val dataRepo: DataRepo,
+    private val getVendingMachineDataUseCase: GetVendingMachineDataUseCase,
+    private val executePurchaseOrderUseCase: ExecutePurchaseOrderUseCase,
+    private val soundManager: SoundManager,
     savedStateHandle: SavedStateHandle
 ): ViewModel() {
 
@@ -31,8 +33,11 @@ class CoinsViewModel @Inject constructor(
     private val _stateFlowInsertedAmount = MutableStateFlow("0.00")
     val stateFlowInsertedAmount = _stateFlowInsertedAmount.asStateFlow()
 
-    private val mutableListCoinsUser = mutableListOf<Coin>()
-    val mutableListCoinsForReturn = mutableListOf<Coin>()
+    private val _stateFlowListCoinsUser = MutableStateFlow(listOf<Coin>())
+    val stateFlowListCoinsUser = _stateFlowListCoinsUser.asStateFlow()
+
+    private val _stateFlowListChange = MutableStateFlow(listOf<Coin>())
+    val stateFlowListChange = _stateFlowListChange.asStateFlow()
 
     private val _stateFlowPriceMet = MutableStateFlow(false)
     val stateFlowPriceMet = _stateFlowPriceMet.asStateFlow()
@@ -43,48 +48,70 @@ class CoinsViewModel @Inject constructor(
     private val _stateFlowOrderCancelled = MutableStateFlow(false)
     val stateflowOrderCancelled = _stateFlowOrderCancelled.asStateFlow()
 
+    private val productId = savedStateHandle.get<Int>(ARG_PRODUCT_ID) ?: -1
+
     init {
         viewModelScope.request {
-            val productId = savedStateHandle.get<Int>(ARG_PRODUCT_ID)
-            _stateFlowSelectedProduct.value = productId?.let {
-                dataRepo.getSelectedProduct(it)
+
+            val data = getVendingMachineDataUseCase(productId)
+
+            _stateFlowSelectedProduct.update {
+                data.selectedProduct
             }
-            _stateFlowCoinsStorage.value = dataRepo.getCoins()
+            _stateFlowCoinsStorage.update {
+                data.coins
+            }
         }
     }
 
-    fun addUserCoin(it: Coin) {
-        _stateFlowInsertedAmount.value =
-            BigDecimal(_stateFlowInsertedAmount.value).add(BigDecimal.valueOf(it.price)).toString()
-        val coinUser = it.copy(quantity = 1)
-        insertCoin(coinUser, mutableListCoinsUser)
-        _stateFlowPriceMet.value = stateFlowInsertedAmount.value.toDouble() >= stateFlowSelectedProduct.value!!.price
+    fun addUserCoin(coin: Coin) {
+        soundManager.play(SoundManager.SoundType.COIN)
+        _stateFlowInsertedAmount.update {
+            BigDecimal(it).add(BigDecimal.valueOf(coin.price)).toString()
+        }
+        val coinUser = coin.copy(quantity = 1)
+        _stateFlowListCoinsUser.update { list ->
+            list.insertCoin(coinUser)
+        }
+
+        if (stateFlowInsertedAmount.value.toDouble() >= stateFlowSelectedProduct.value!!.price)
+            _stateFlowPriceMet.update { true }
     }
 
     fun addUserCoins() {
         viewModelScope.request {
-            stateFlowSelectedProduct.value?.let {
-                val product = it.copy(quantity = it.quantity.minus(1))
-                dataRepo.updateProduct(product)
-            }
+            val currentProduct = _stateFlowSelectedProduct.value ?: return@request
+            val currentStorage = _stateFlowCoinsStorage.value
+            val userCoins = _stateFlowListCoinsUser.value
+            val totalAmount = stateFlowInsertedAmount.value
 
-            insertUserCoins(mutableListCoinsUser, _stateFlowCoinsStorage.value)
-            mutableListCoinsUser.clear()
-            stateFlowSelectedProduct.value?.let {
-                mutableListCoinsForReturn.addAll(getCoinsForReturn(
-                    stateFlowInsertedAmount.value,
-                    it.price,
-                    _stateFlowCoinsStorage.value
-                ))
-                _stateFlowChangeCalculated.value = true
-            }
-            dataRepo.updateCoins(_stateFlowCoinsStorage.value)
+            val result = executePurchaseOrderUseCase(
+                product = currentProduct,
+                currentStorageCoins = currentStorage,
+                userInsertedCoins = userCoins,
+                totalInsertedAmount = totalAmount
+            )
+
+            _stateFlowSelectedProduct.value = result.updatedProduct
+            _stateFlowCoinsStorage.value = result.updatedCoins
+            _stateFlowListChange.value = result.change
+
+            _stateFlowListCoinsUser.value = emptyList()
+            _stateFlowChangeCalculated.value = true
         }
     }
 
     fun cancelOrder() {
-        mutableListCoinsForReturn.addAll(mutableListCoinsUser)
-        mutableListCoinsUser.clear()
+        _stateFlowListChange.update {
+            _stateFlowListCoinsUser.value
+        }
+        _stateFlowListCoinsUser.update {
+            emptyList()
+        }
         _stateFlowOrderCancelled.value = true
+    }
+
+    fun playClickSound() {
+        soundManager.play(SoundManager.SoundType.CLICK)
     }
 }

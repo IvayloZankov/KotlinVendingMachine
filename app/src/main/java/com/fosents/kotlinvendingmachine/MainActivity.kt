@@ -10,7 +10,7 @@ import androidx.compose.material3.RippleConfiguration
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.fosents.kotlinvendingmachine.navigation.SetupNavGraph
+import com.fosents.kotlinvendingmachine.ui.navigation.SetupNavGraph
 import com.fosents.kotlinvendingmachine.sound.SoundManager
 import com.fosents.kotlinvendingmachine.ui.theme.Gold
 import com.fosents.kotlinvendingmachine.ui.theme.KotlinVendingMachineTheme
@@ -41,6 +41,5 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-        SoundManager.getInstance().loadSounds(this)
     }
 }

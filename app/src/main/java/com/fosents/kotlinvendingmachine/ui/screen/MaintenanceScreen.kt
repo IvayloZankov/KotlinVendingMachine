@@ -27,19 +27,30 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.fosents.kotlinvendingmachine.R
-import com.fosents.kotlinvendingmachine.data.DataRepo
-import com.fosents.kotlinvendingmachine.data.FakeRemoteDataSourceImpl
-import com.fosents.kotlinvendingmachine.data.local.FakeDataStoreOperations
 import com.fosents.kotlinvendingmachine.data.remote.utils.ExceptionHandler
-import com.fosents.kotlinvendingmachine.sound.SoundManager
 import com.fosents.kotlinvendingmachine.ui.alert.NoConnectionAlert
 import com.fosents.kotlinvendingmachine.ui.theme.BackgroundColor
 import com.fosents.kotlinvendingmachine.ui.theme.Gold
 import com.fosents.kotlinvendingmachine.ui.theme.Teal700
 import com.fosents.kotlinvendingmachine.ui.theme.Typography
+
+@Composable
+fun MaintenanceFragment(
+    viewModel: MaintenanceViewModel = hiltViewModel(),
+    onBackClick: () -> Unit
+) {
+
+    MaintenanceScreen(
+        onResetClick = {
+            viewModel.initReset(it)
+        },
+        onBackClick = {
+            viewModel.playClickSound()
+            onBackClick()
+        }
+    )
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,8 +79,8 @@ fun MaintenanceTopBar(onIconClick: () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MaintenanceScreen(
-    navController: NavHostController,
-    maintenanceViewModel: MaintenanceViewModel = hiltViewModel()
+    onResetClick: (Int) -> Unit = {},
+    onBackClick: () -> Unit = {}
 ) {
 
     val stateFlowError = ExceptionHandler.stateFlowError.collectAsState()
@@ -93,8 +104,7 @@ fun MaintenanceScreen(
     Scaffold(
         topBar = {
             MaintenanceTopBar {
-                SoundManager.getInstance().playClick()
-                navController.popBackStack()
+                onBackClick()
             }
         }
     ) { paddingValues ->
@@ -109,8 +119,7 @@ fun MaintenanceScreen(
             ) {
                 items(2) {
                     MaintenanceCard(options[it]) {
-                        SoundManager.getInstance().playClick()
-                        maintenanceViewModel.initReset(options[it])
+                        onResetClick(options[it])
                     }
                 }
             }
@@ -161,10 +170,5 @@ fun MaintenanceCard(
 @Preview(showBackground = true)
 @Composable
 fun PreviewMaintenanceScreen() {
-    MaintenanceScreen(
-        rememberNavController(),
-        maintenanceViewModel = MaintenanceViewModel(
-            DataRepo(FakeRemoteDataSourceImpl(), FakeDataStoreOperations())
-        )
-    )
+    MaintenanceScreen()
 }

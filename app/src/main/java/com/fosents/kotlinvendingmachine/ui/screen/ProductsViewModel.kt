@@ -2,28 +2,28 @@ package com.fosents.kotlinvendingmachine.ui.screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.fosents.kotlinvendingmachine.data.DataRepo
 import com.fosents.kotlinvendingmachine.data.remote.utils.request
-import com.fosents.kotlinvendingmachine.model.Coin
-import com.fosents.kotlinvendingmachine.model.Product
+import com.fosents.kotlinvendingmachine.domain.model.Product
+import com.fosents.kotlinvendingmachine.domain.usecase.CheckOutOfOrderUseCase
+import com.fosents.kotlinvendingmachine.domain.usecase.GetAvailableProductsUseCase
+import com.fosents.kotlinvendingmachine.domain.usecase.ManageVendingIdUseCase
+import com.fosents.kotlinvendingmachine.domain.usecase.SyncRemoteDataUseCase
+import com.fosents.kotlinvendingmachine.sound.SoundManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ProductsViewModel @Inject constructor(
-    private val dataRepo: DataRepo
+    private val getAvailableProductsUseCase: GetAvailableProductsUseCase,
+    private val checkOutOfOrderUseCase: CheckOutOfOrderUseCase,
+    private val syncRemoteDataUseCase: SyncRemoteDataUseCase,
+    private val manageVendingIdUseCase: ManageVendingIdUseCase,
+    private val soundManager: SoundManager
 ): ViewModel() {
-
-    private val _vendingId = MutableStateFlow("")
-    private val vendingId = _vendingId.asStateFlow()
-
-    private val _coinsStorage = MutableStateFlow<List<Coin>>(emptyList())
-//    val coinsStorage: StateFlow<List<Coin>> = _coinsStorage
 
     private val _stateFlowProducts = MutableStateFlow<List<Product>>(emptyList())
     val stateFlowProducts = _stateFlowProducts.asStateFlow()
@@ -31,38 +31,44 @@ class ProductsViewModel @Inject constructor(
     private val _outOfOrder = MutableStateFlow(false)
     val outOfOrder = _outOfOrder.asStateFlow()
 
-    private val _isLoading = MutableStateFlow(false)
+    private val _isLoading = MutableStateFlow(true)
     val isLoading = _isLoading.asStateFlow()
 
     init {
-        viewModelScope.launch(Dispatchers.Default) {
-            _vendingId.value = dataRepo.readVendingId().stateIn(viewModelScope).value
-            if (vendingId.value == "") {
-                dataRepo.generateVendingId()
-            }
+        viewModelScope.launch {
+            manageVendingIdUseCase()
         }
         fetchRemoteData()
     }
 
     fun fetchRemoteData() {
-        _isLoading.value = true
         viewModelScope.request {
-            dataRepo.fetchRemoteData()
+            syncRemoteDataUseCase()
             _isLoading.value = false
         }
     }
 
     fun fetchCoins() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _coinsStorage.value = dataRepo.getCoins()
-            if (_coinsStorage.value.isNotEmpty())
-                _outOfOrder.value = _coinsStorage.value[0].quantity < 40
+        viewModelScope.launch {
+            val outOfOrder = checkOutOfOrderUseCase()
+            if (outOfOrder) {
+                soundManager.play(SoundManager.SoundType.ERROR)
+            }
+            _outOfOrder.update {
+                outOfOrder
+            }
         }
     }
 
     fun fetchProducts() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _stateFlowProducts.value = dataRepo.getProducts().filter { it.quantity > 0 }
+        viewModelScope.launch {
+            _stateFlowProducts.update {
+                getAvailableProductsUseCase()
+            }
         }
+    }
+
+    fun playClickSound() {
+        soundManager.play(SoundManager.SoundType.CLICK)
     }
 }

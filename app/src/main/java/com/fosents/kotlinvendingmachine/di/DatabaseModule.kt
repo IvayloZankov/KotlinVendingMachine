@@ -3,7 +3,8 @@ package com.fosents.kotlinvendingmachine.di
 import android.content.Context
 import androidx.room.Room
 import com.fosents.kotlinvendingmachine.data.local.VendingDatabase
-import com.fosents.kotlinvendingmachine.util.Constants.VENDING_DATABASE
+import com.fosents.kotlinvendingmachine.data.local.VendingDatabase.Companion.DATABASE_NAME
+import com.fosents.kotlinvendingmachine.data.local.VendingDatabase.Companion.MIGRATION
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,6 +23,8 @@ object DatabaseModule {
     ) = Room.databaseBuilder(
         context,
         VendingDatabase::class.java,
-        VENDING_DATABASE
-    ).build()
+        DATABASE_NAME
+    )
+        .addMigrations(MIGRATION)
+        .build()
 }

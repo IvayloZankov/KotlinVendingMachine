@@ -7,17 +7,22 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.fosents.kotlinvendingmachine.data.local.DataStoreOperations
+import com.fosents.kotlinvendingmachine.domain.repository.SettingsRepository
 import com.fosents.kotlinvendingmachine.util.Constants.PREFS_KEY_ID
 import com.fosents.kotlinvendingmachine.util.Constants.PREFS_NAME
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import java.io.IOException
+import java.util.UUID
+import javax.inject.Inject
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = PREFS_NAME)
 
-class DataStoreOperationsImpl(context: Context): DataStoreOperations {
+class SettingsRepositoryImpl @Inject constructor(
+    @ApplicationContext context: Context
+): SettingsRepository {
 
     private object PrefsKey {
         val vendingKey = stringPreferencesKey(name = PREFS_KEY_ID)
@@ -26,8 +31,8 @@ class DataStoreOperationsImpl(context: Context): DataStoreOperations {
     private val dataStore = context.dataStore
 
     override suspend fun generateVendingId() {
-        dataStore.edit {
-            prefs -> prefs[PrefsKey.vendingKey] = getRandomString()
+        dataStore.edit { prefs ->
+            prefs[PrefsKey.vendingKey] = UUID.randomUUID().toString()
         }
     }
 
@@ -42,9 +47,4 @@ class DataStoreOperationsImpl(context: Context): DataStoreOperations {
                 prefs -> prefs[PrefsKey.vendingKey] ?: ""
         }
     }
-}
-
-private fun getRandomString(): String {
-    val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
-    return (1..32).map { allowedChars.random() }.joinToString("")
 }

@@ -4,48 +4,47 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.media.SoundPool
 import com.fosents.kotlinvendingmachine.R
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class SoundManager {
+@Singleton
+class SoundManager @Inject constructor(
+    @param:ApplicationContext private val context: Context ) {
 
     private var soundPool: SoundPool
+    private val soundMap = mutableMapOf<SoundType, Int>()
 
-    private var soundClick = 0
-    private var soundCoin = 0
-    private var soundError = 0
+    enum class SoundType { CLICK, COIN, ERROR }
 
     init {
         val audioAttributes = AudioAttributes.Builder()
             .setUsage(AudioAttributes.USAGE_GAME)
             .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
             .build()
-        soundPool =  SoundPool.Builder().setMaxStreams(3).setAudioAttributes(audioAttributes).build()
+
+        soundPool =  SoundPool.Builder()
+            .setMaxStreams(3)
+            .setAudioAttributes(audioAttributes)
+            .build()
+
+        loadSounds()
     }
 
-    companion object {
-        @Volatile
-        private var instance: SoundManager? = null
-
-        fun getInstance() =
-            instance ?: synchronized(this) {
-                instance ?: SoundManager().also { instance = it }
-            }
+    private fun loadSounds() {
+        soundMap[SoundType.CLICK] = soundPool.load(context, R.raw.click_default, 1)
+        soundMap[SoundType.COIN] = soundPool.load(context, R.raw.click_coin, 1)
+        soundMap[SoundType.ERROR] = soundPool.load(context, R.raw.out_of_order, 1)
     }
 
-    fun loadSounds(context: Context) {
-        soundClick = soundPool.load(context, R.raw.click_default, 1)
-        soundCoin = soundPool.load(context, R.raw.click_coin, 1)
-        soundError = soundPool.load(context, R.raw.out_of_order, 1)
+    fun play(type: SoundType) {
+        val soundId = soundMap[type] ?: return
+        if (soundId != 0) {
+            soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
+        }
     }
 
-    fun playClick() {
-        soundPool.play(soundClick, 1f, 1f, 1, 0, 1f)
-    }
-
-    fun playCoin() {
-        soundPool.play(soundCoin, 1f, 1f, 1, 0, 1f)
-    }
-
-    fun playError() {
-        soundPool.play(soundError, 1f, 1f, 1, 0, 1f)
+    fun release() {
+        soundPool.release()
     }
 }
