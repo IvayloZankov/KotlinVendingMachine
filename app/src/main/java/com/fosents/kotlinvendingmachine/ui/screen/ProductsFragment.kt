@@ -5,18 +5,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +26,7 @@ import com.fosents.kotlinvendingmachine.data.remote.utils.OneTimeEvent
 import com.fosents.kotlinvendingmachine.domain.model.Product
 import com.fosents.kotlinvendingmachine.ui.alert.NoConnectionAlert
 import com.fosents.kotlinvendingmachine.ui.alert.ShowOutOfOrderAlert
+import com.fosents.kotlinvendingmachine.ui.screen.component.VendingTopBar
 import com.fosents.kotlinvendingmachine.ui.theme.Gold
 import com.fosents.kotlinvendingmachine.ui.theme.Teal700
 import com.fosents.kotlinvendingmachine.ui.theme.Typography
@@ -72,33 +66,6 @@ fun ProductsFragment(
     )
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ProductsTopBar(onMaintenanceClicked: () -> Unit) {
-    TopAppBar(
-        title = {
-            Text(
-                text = stringResource(R.string.app_name),
-                color = Color.White
-            )
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = BackgroundColor,
-        ),
-        actions = {
-            IconButton(onClick = onMaintenanceClicked) {
-                Icon(
-                    imageVector = Icons.Default.Settings,
-                    tint = Color.White,
-                    contentDescription = stringResource(id = R.string.maintenance_button)
-                )
-            }
-        }
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductsScreen(
     products: List<Product>,
@@ -134,7 +101,11 @@ fun ProductsScreen(
 
     Scaffold(
         topBar = {
-            ProductsTopBar {
+            VendingTopBar(
+                title = stringResource(R.string.app_name),
+                iconResource = R.drawable.ic_settings_24,
+                iconDescription = stringResource(id = R.string.maintenance_button)
+            ) {
                 onGoMaintenanceClick()
             }
         }

@@ -10,18 +10,11 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -42,6 +35,7 @@ import com.fosents.kotlinvendingmachine.domain.model.Product
 import com.fosents.kotlinvendingmachine.ui.alert.NoConnectionAlert
 import com.fosents.kotlinvendingmachine.ui.alert.ShowGetProductAlert
 import com.fosents.kotlinvendingmachine.ui.alert.ShowOrderCancelledAlert
+import com.fosents.kotlinvendingmachine.ui.screen.component.VendingTopBar
 import com.fosents.kotlinvendingmachine.ui.theme.*
 import java.util.*
 
@@ -89,31 +83,6 @@ fun CoinsFragment(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CoinsTopBar(onIconClick: () -> Unit) {
-    TopAppBar(
-        title = {
-            Text(
-                text = stringResource(R.string.app_name),
-                color = Color.White
-            )
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = BackgroundColor,
-        ),
-        actions = {
-            IconButton(onClick = onIconClick) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    tint = Color.White,
-                    contentDescription = stringResource(id = R.string.back_button)
-                )
-            }
-        })
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoinsScreen(
     selectedProduct: Product?,
@@ -172,7 +141,11 @@ fun CoinsScreen(
 
     Scaffold(
         topBar = {
-            CoinsTopBar {
+            VendingTopBar(
+                title = stringResource(R.string.app_name),
+                iconResource = R.drawable.ic_arrow_back_24,
+                iconDescription = stringResource(id = R.string.back_button)
+            ) {
                 onOrderCancelledCLick()
             }
         }
