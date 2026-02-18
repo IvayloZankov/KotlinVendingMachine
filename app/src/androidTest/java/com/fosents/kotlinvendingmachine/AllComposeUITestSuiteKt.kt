@@ -12,4 +12,4 @@ import org.junit.runners.Suite
     MaintenanceScreenTest::class,
     ProductsScreenTest::class,
 )
-class AllUnitTestSuiteKt
+class AllComposeUITestSuiteKt

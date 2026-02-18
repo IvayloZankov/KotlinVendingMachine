@@ -8,7 +8,7 @@ import com.fosents.kotlinvendingmachine.domain.model.Coin
 import com.fosents.kotlinvendingmachine.domain.model.Product
 import com.fosents.kotlinvendingmachine.domain.model.insertCoin
 import com.fosents.kotlinvendingmachine.domain.usecase.ExecutePurchaseOrderUseCase
-import com.fosents.kotlinvendingmachine.domain.usecase.GetVendingMachineDataUseCase
+import com.fosents.kotlinvendingmachine.domain.usecase.GetProductAndCoinsUseCase
 import com.fosents.kotlinvendingmachine.sound.SoundManager
 import com.fosents.kotlinvendingmachine.util.Constants.ARG_PRODUCT_ID
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CoinsViewModel @Inject constructor(
-    private val getVendingMachineDataUseCase: GetVendingMachineDataUseCase,
+    private val getProductAndCoinsUseCase: GetProductAndCoinsUseCase,
     private val executePurchaseOrderUseCase: ExecutePurchaseOrderUseCase,
     private val soundManager: SoundManager,
     savedStateHandle: SavedStateHandle
@@ -53,7 +53,7 @@ class CoinsViewModel @Inject constructor(
     init {
         viewModelScope.request {
 
-            val data = getVendingMachineDataUseCase(productId)
+            val data = getProductAndCoinsUseCase(productId)
 
             _stateFlowSelectedProduct.update {
                 data.selectedProduct

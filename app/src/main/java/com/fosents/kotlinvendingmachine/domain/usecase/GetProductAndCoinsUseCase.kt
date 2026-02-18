@@ -7,7 +7,7 @@ import javax.inject.Inject
 /**
  * Use case to get the vending machine products and coins.
  */
-class GetVendingMachineDataUseCase @Inject constructor(
+class GetProductAndCoinsUseCase @Inject constructor(
     private val repository: VendingRepository
 ) {
     suspend operator fun invoke(productId: Int): VendingScreenData {
