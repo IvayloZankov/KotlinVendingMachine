@@ -3,7 +3,9 @@ package com.fosents.kotlinvendingmachine.domain.usecase
 import com.fosents.kotlinvendingmachine.domain.model.Product
 import com.fosents.kotlinvendingmachine.domain.repository.VendingRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 /**
@@ -12,10 +14,11 @@ import javax.inject.Inject
 class GetAvailableProductsUseCase @Inject constructor(
     private val repository: VendingRepository
 ) {
-    suspend operator fun invoke(): List<Product> {
-        val products = repository.getProducts()
-        return withContext(Dispatchers.Default) {
-            products.filter { it.quantity > 0 }
-        }
+    operator fun invoke(): Flow<List<Product>> {
+        return repository.getProducts()
+            .map { products ->
+                products.filter { product -> product.quantity > 0 }
+            }
+            .flowOn(Dispatchers.Default)
     }
 }

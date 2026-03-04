@@ -5,12 +5,13 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy.Companion.REPLACE
 import androidx.room.Query
 import com.fosents.kotlinvendingmachine.data.local.entity.ProductEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ProductsDao {
 
     @Query("SELECT * FROM product_table ORDER BY id ASC")
-    suspend fun getProducts(): List<ProductEntity>
+    fun getProductsFlow(): Flow<List<ProductEntity>>
 
     @Query("SELECT * FROM product_table WHERE id=:productId")
     suspend fun getSelectedProduct(productId: Int): ProductEntity

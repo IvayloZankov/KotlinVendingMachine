@@ -11,6 +11,9 @@ import com.fosents.kotlinvendingmachine.domain.model.Coin
 import com.fosents.kotlinvendingmachine.domain.model.Product
 import com.fosents.kotlinvendingmachine.domain.repository.VendingRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -21,10 +24,12 @@ class VendingRepositoryImpl @Inject constructor(
     private val productsDao = database.productDao()
     private val coinsDao = database.coinDao()
 
-    override suspend fun getProducts(): List<Product> {
-        return withContext(Dispatchers.IO) {
-            productsDao.getProducts().map { it.toDomain() }
-        }
+    override fun getProducts(): Flow<List<Product>> {
+
+        return productsDao.getProductsFlow().map { list ->
+            list.map { it.toDomain() }
+        }.flowOn(Dispatchers.Default)
+
     }
 
     override suspend fun getSelectedProduct(productId: Int): Product {

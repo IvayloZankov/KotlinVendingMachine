@@ -44,7 +44,6 @@ fun ProductsFragment(
     val stateFlowError by stateFlowError.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
-    viewModel.fetchProducts()
     viewModel.fetchCoins()
 
     ProductsScreen(
@@ -180,8 +179,8 @@ fun ProductCard(
             onClick()
         }},
         elevation =  ButtonDefaults.buttonElevation(
-            defaultElevation = 10.dp,
-            pressedElevation = 15.dp,
+            defaultElevation = 5.dp,
+            pressedElevation = 7.dp,
             disabledElevation = 0.dp
         ),
         shape = RoundedCornerShape(20.dp),

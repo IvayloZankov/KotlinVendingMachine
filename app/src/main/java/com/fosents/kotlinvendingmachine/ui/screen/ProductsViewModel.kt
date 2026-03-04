@@ -11,22 +11,29 @@ import com.fosents.kotlinvendingmachine.domain.usecase.SyncRemoteDataUseCase
 import com.fosents.kotlinvendingmachine.sound.SoundManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ProductsViewModel @Inject constructor(
-    private val getAvailableProductsUseCase: GetAvailableProductsUseCase,
+    getAvailableProductsUseCase: GetAvailableProductsUseCase,
     private val checkOutOfOrderUseCase: CheckOutOfOrderUseCase,
     private val syncRemoteDataUseCase: SyncRemoteDataUseCase,
     private val manageVendingIdUseCase: ManageVendingIdUseCase,
     private val soundManager: SoundManager
 ): ViewModel() {
 
-    private val _stateFlowProducts = MutableStateFlow<List<Product>>(emptyList())
-    val stateFlowProducts = _stateFlowProducts.asStateFlow()
+    val stateFlowProducts: StateFlow<List<Product>> = getAvailableProductsUseCase()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList()
+        )
 
     private val _outOfOrder = MutableStateFlow(false)
     val outOfOrder = _outOfOrder.asStateFlow()
@@ -56,14 +63,6 @@ class ProductsViewModel @Inject constructor(
             }
             _outOfOrder.update {
                 outOfOrder
-            }
-        }
-    }
-
-    fun fetchProducts() {
-        viewModelScope.launch {
-            _stateFlowProducts.update {
-                getAvailableProductsUseCase()
             }
         }
     }
