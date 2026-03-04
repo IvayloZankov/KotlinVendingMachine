@@ -10,7 +10,6 @@ import com.fosents.kotlinvendingmachine.domain.model.insertCoin
 import com.fosents.kotlinvendingmachine.domain.usecase.ExecutePurchaseOrderUseCase
 import com.fosents.kotlinvendingmachine.domain.usecase.GetProductAndCoinsUseCase
 import com.fosents.kotlinvendingmachine.sound.SoundManager
-import com.fosents.kotlinvendingmachine.util.Constants.ARG_PRODUCT_ID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import java.math.BigDecimal

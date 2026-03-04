@@ -2,13 +2,14 @@ package com.fosents.kotlinvendingmachine.data.remote
 
 import com.fosents.kotlinvendingmachine.data.remote.dto.CoinDto
 import com.fosents.kotlinvendingmachine.data.remote.dto.ProductDto
-import com.fosents.kotlinvendingmachine.util.RequestUrl.DECREASE_PRODUCT
-import com.fosents.kotlinvendingmachine.util.RequestUrl.GET_COINS
-import com.fosents.kotlinvendingmachine.util.RequestUrl.GET_PRODUCTS
-import com.fosents.kotlinvendingmachine.util.RequestUrl.RESET_COINS
-import com.fosents.kotlinvendingmachine.util.RequestUrl.RESET_PRODUCTS
-import com.fosents.kotlinvendingmachine.util.RequestUrl.UPDATE_COINS
 import retrofit2.http.*
+
+private const val GET_PRODUCTS = "getProducts"
+private const val DECREASE_PRODUCT = "decreaseProduct"
+private const val RESET_PRODUCTS = "resetProducts"
+private const val GET_COINS = "getCoins"
+private const val RESET_COINS = "resetCoins"
+private const val UPDATE_COINS = "updateCoins"
 
 interface VendingApi {
 

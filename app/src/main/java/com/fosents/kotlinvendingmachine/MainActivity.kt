@@ -29,7 +29,7 @@ class MainActivity : ComponentActivity() {
             hoveredAlpha = 1f,
             pressedAlpha = 0.2f
         )
-        )
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

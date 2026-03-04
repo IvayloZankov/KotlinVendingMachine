@@ -12,7 +12,8 @@ import androidx.navigation.navArgument
 import com.fosents.kotlinvendingmachine.ui.screen.CoinsFragment
 import com.fosents.kotlinvendingmachine.ui.screen.MaintenanceFragment
 import com.fosents.kotlinvendingmachine.ui.screen.ProductsFragment
-import com.fosents.kotlinvendingmachine.util.Constants.ARG_PRODUCT_ID
+
+private const val ARG_PRODUCT_ID = "productId"
 
 @ExperimentalAnimationApi
 @Composable

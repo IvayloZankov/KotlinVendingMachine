@@ -8,8 +8,6 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.fosents.kotlinvendingmachine.domain.repository.SettingsRepository
-import com.fosents.kotlinvendingmachine.util.Constants.PREFS_KEY_ID
-import com.fosents.kotlinvendingmachine.util.Constants.PREFS_NAME
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -19,6 +17,9 @@ import java.util.UUID
 import javax.inject.Inject
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = PREFS_NAME)
+
+private const val PREFS_NAME = "vending_prefs"
+private const val PREFS_KEY_ID = "vending_id"
 
 class SettingsRepositoryImpl @Inject constructor(
     @ApplicationContext context: Context
