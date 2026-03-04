@@ -13,7 +13,7 @@ import com.fosents.kotlinvendingmachine.ui.screen.CoinsFragment
 import com.fosents.kotlinvendingmachine.ui.screen.MaintenanceFragment
 import com.fosents.kotlinvendingmachine.ui.screen.ProductsFragment
 
-private const val ARG_PRODUCT_ID = "productId"
+const val ARG_PRODUCT_ID = "productId"
 
 @ExperimentalAnimationApi
 @Composable
